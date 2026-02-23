@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pint - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .pin-card { border-radius: 16px; overflow: hidden; transition: transform 0.2s; border: none; }
+        .pin-card:hover { transform: scale(1.02); cursor: zoom-in; }
+        .pin-img { border-radius: 16px; width: 100%; object-fit: cover; }
+        .nav-icon { font-size: 1.8rem; color: #111; padding: 10px; }
+        .nav-icon:hover { background-color: #e9e9e9; border-radius: 50%; }
+        .active-icon { color: #cc0000 !important; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand bg-white sticky-top py-3 shadow-sm mb-4">
+		<div class="d-flex flex-column align-items-center bg-white vh-100 border-end py-3 shadow-sm" style="width: 80px; position: fixed; left: 0; top: 0;">
+		    <a th:href="@{/home}" class="mb-4 text-danger"><i class="bi bi-pinterest fs-1"></i></a>
+		    <a th:href="@{/home}" class="nav-link p-3 text-dark"><i class="bi bi-house-door fs-2"></i></a>
+		    <a th:href="@{/mis-pines}" class="nav-link p-3 text-dark"><i class="bi bi-grid fs-2"></i></a>
+		    <button class="btn p-3 text-dark" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
+		    <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
+		</div>
+		
+	<div class="container-fluid d-flex justify-content-end">
+	    <button class="btn btn-light rounded-pill">
+	        <i class="bi bi-person-circle"></i>
+	        <span th:text="${session.usuarioLogueado.nombre}"></span>
+	    </button>
+	</div>
+
+
+    </nav>
+
+    <div class="container">
+        <h2 class="fw-bold mb-4" th:text="${tituloPagina}"></h2>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <div class="col" th:each="img : ${imagenes}">
+                <div class="card pin-card shadow-sm">
+                    <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
+                    <div class="p-2">
+                        <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
+                        <p class="text-muted" style="font-size: 0.75rem;" th:text="'@' + ${img.usuario.nombre}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-0"><h5 class="modal-title fw-bold">Crear Pin</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <form th:action="@{/publicar}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Título</label>
+                            <input type="text" name="titulo" class="form-control rounded-pill" placeholder="¿De qué trata?" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">URL de la imagen</label>
+                            <input type="text" name="enlace" class="form-control rounded-pill" placeholder="Pega el link aquí" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold">Publicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

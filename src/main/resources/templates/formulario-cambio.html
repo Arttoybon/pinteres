@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Actualizar Contraseña</title>
+</head>
+<body>
+    <h2>Actualizar contraseña de <span th:text="${userId}"></span></h2>
+
+    <form th:action="@{/usuario/actualizar-completo}" method="post">
+        <input type="hidden" name="idViejo" th:value="${userId}" />
+
+        <label for="pass">Nueva Contraseña:</label>
+        <input type="password" id="pass" name="nuevaContrasenya" required />
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+</body>
+</html>
