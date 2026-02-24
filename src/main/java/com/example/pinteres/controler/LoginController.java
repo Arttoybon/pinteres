@@ -70,7 +70,7 @@ public class LoginController {
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
-		return "redirect:/?noexiste=false";
+		return "redirect:/?recuperado=true";
 	}
 	
 }

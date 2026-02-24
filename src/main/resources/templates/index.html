@@ -26,7 +26,13 @@
 	    <div th:if="${param.existe}" class="alert alert-warning py-2 rounded-pill small mb-3">
 	        <i class="bi bi-person-exclamation me-1"></i> Ese nombre de usuario ya está en uso.
 	    </div>
-	
+	    
+		<div th:if="${param.noexiste}" class="alert alert-danger py-2 rounded-pill small mb-3">
+	        <i class="bi bi-exclamation-circle-fill me-1"></i> El usuario no existe
+	    </div>
+		    <div th:if="${param.recuperado}" class="alert alert-success py-2 rounded-pill small mb-3">
+	        <i class="bi bi-check-circle-fill me-1"></i> Se ha enviado un correo para recuperar tu cuenta
+	    </div>
 	    <form th:action="@{/login}" method="post">
 	        <input type="text" name="nombre" class="form-control mb-3 rounded-pill p-3 border-secondary-subtle" placeholder="Nombre de usuario" required>
 	        <input type="password" name="contrasenya" class="form-control mb-3 rounded-pill p-3 border-secondary-subtle" placeholder="Contraseña" required>
