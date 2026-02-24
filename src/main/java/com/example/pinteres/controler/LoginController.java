@@ -56,9 +56,9 @@ public class LoginController {
 		try {
 			Optional<Usuario> usuario = usuarioRepository.findById(nombre);
 			 if (usuario.isPresent()) {
-				 Email emai = new Email(usuario.get().getCorreo(),"Recuperación de correo","Entra en el sigueinte "
-				 		+ "enlace para restablecer tu contraseña http://localhost:8080/usuario/cambiar-"
-				 		+ "password?id="+usuario.get().getNombre());
+				 Email emai = new Email(usuario.get().getCorreo(),"Recuperación de correo","Entra en el siguiente "
+				 		+ "enlace para restablecer tu contraseña.",
+				 		"http://localhost:8080/usuario/cambiar-password?id="+usuario.get().getNombre());
 					emailServ.sendMail(emai);
 			 }else {
 			        // Importante: Para que el error se vea en el index tras un redirect, 

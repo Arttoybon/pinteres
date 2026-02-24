@@ -17,4 +17,6 @@ public class Email {
 	
 	private String mensaje;
 	
+	private String urlBtn;
+	
 }

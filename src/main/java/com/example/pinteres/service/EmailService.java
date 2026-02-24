@@ -35,6 +35,7 @@ public class EmailService implements EmailInterface {
 			helper.setSubject(email.getAsunto());
 			Context context = new Context();
 			context.setVariable("mensaje",email.getMensaje());
+			context.setVariable("urlBtn",email.getUrlBtn());
 			String contentHtml= templateEngine.process("email", context);
 			
 			helper.setText(contentHtml,true);
