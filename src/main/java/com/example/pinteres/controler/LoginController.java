@@ -3,19 +3,29 @@ package com.example.pinteres.controler;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.pinteres.entity.Email;
 import com.example.pinteres.entity.Usuario;
 import com.example.pinteres.repository.UsuarioRepository;
+import com.example.pinteres.service.implement.EmailInterface;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
+	
+	@Autowired
+	EmailInterface emailServ;
+	
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
@@ -43,17 +53,24 @@ public class LoginController {
 	}
 	
 	@PostMapping("/recuperar-password")
-	public String recuperarPassword(@RequestParam("usuario") String nombre, Model model) {
-	    Optional<Usuario> usuario = usuarioRepository.findById(nombre);
-
-	    if (usuario.isPresent()) {
-	        // Redirigimos a la ruta que carga el formulario de cambio
-	        // Usamos el nombre como identificador ya que tu repositorio lo usa así
-	        return "redirect:/usuario/cambiar-password?id=" + usuario.get().getNombre();
-	    } else {
-	        // Importante: Para que el error se vea en el index tras un redirect, 
-	        // suele ser mejor usar redirect:/?errorUsuario=true
-	        return "redirect:/?noexiste=true";
-	    }
+	public String sendEmail(@RequestParam("usuario")String nombre ) {
+		try {
+			Optional<Usuario> usuario = usuarioRepository.findById(nombre);
+			 if (usuario.isPresent()) {
+				 Email emai = new Email(usuario.get().getCorreo(),"Recuperación de correo","Entra en el sigueinte "
+				 		+ "enlace para restablecer tu contraseña http://localhost:8080/usuario/cambiar-"
+				 		+ "password?id="+usuario.get().getNombre());
+					emailServ.sendMail(emai);
+			 }else {
+			        // Importante: Para que el error se vea en el index tras un redirect, 
+			        // suele ser mejor usar redirect:/?errorUsuario=true
+			        return "redirect:/?noexiste=true";
+			    }
+			
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		return "redirect:/?noexiste=false";
 	}
+	
 }
