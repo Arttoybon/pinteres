@@ -42,15 +42,23 @@ public class UsuarioService {
 	}
 
 	// UPDATE
-	public Usuario actualizar(String nombre, Usuario datos) {
-		Usuario u = buscarPorNombre(nombre);
+	public Usuario actualizar( Usuario usu) {
+		Usuario u = buscarPorNombre(usu.getNombre());
 
-		u.setCorreo(datos.getCorreo());
-		u.setContrasenya(datos.getContrasenya());
+		u.setCorreo(usu.getCorreo());
+		u.setContrasenya(usu.getContrasenya());
 
 		return usuResp.save(u);
 	}
+	// UPDATE
+	public Usuario actualizarContraseya(String nombre, String Contraseya) {
+		Usuario u = buscarPorNombre(nombre);
+		String passwordHasheada = encoder.encode(Contraseya);
+		
+		u.setContrasenya(passwordHasheada);
 
+		return usuResp.save(u);
+	}
 	// DELETE
 	public void borrar(String nombre) {
 		usuResp.deleteById(nombre);

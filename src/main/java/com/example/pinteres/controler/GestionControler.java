@@ -73,9 +73,17 @@ public class GestionControler {
 	@GetMapping("/borrar/{id}")
 	public String borrar(@PathVariable Long id, HttpSession session) {
 		Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-		if (user != null) {
-			imagenService.borrar(id);
+		if (user == null) {
+			return "redirect:/";
 		}
+		
+		Imagen selectedImg =  imagenService.buscarPorId(id);
+		
+		if(!user.equals(selectedImg.getUsuario())) {
+			return "redirect:/gestion/mis-pines?erroru=true";
+		}
+		
+		imagenService.borrar(id);
 		return "redirect:/gestion/mis-pines";
 	}
 }

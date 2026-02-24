@@ -7,7 +7,7 @@
 <body>
     <h2>Actualizar contraseña de <span th:text="${userId}"></span></h2>
 
-    <form th:action="@{/usuario/actualizar-completo}" method="post">
+    <form th:action="@{/usuario/actualizar-contraseya}" method="post">
         <input type="hidden" name="idViejo" th:value="${userId}" />
 
         <label for="pass">Nueva Contraseña:</label>

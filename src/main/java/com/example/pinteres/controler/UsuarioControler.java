@@ -26,7 +26,7 @@ public class UsuarioControler {
     public String registrarUsuario(@RequestParam String nombre, 
                                    @RequestParam String contrasenya, 
                                    @RequestParam String correo) { // Recibe el correo
-        if (usuarioService.buscarPorNombre(nombre) != null) {
+        if (usuarioService.buscarPorNombre(nombre) != null || nombre.trim().equals("")) {
             return "redirect:/?existe=true";
         }
 
@@ -67,18 +67,12 @@ public class UsuarioControler {
         return "formulario-cambio"; // Asegúrate de que este archivo exista en templates
     }
     
-    @PostMapping("/actualizar-completo")
-    public String actualizarCompleto(@RequestParam("idViejo") String nombreUsuario,
+    @PostMapping("/actualizar-contraseya")
+    public String actualizarContraseya(@RequestParam("idViejo") String nombreUsuario,
                                      @RequestParam("nuevaContrasenya") String nuevaContrasenya) {
-        
-        // Buscamos al usuario existente por su nombre (que es lo que pasas como ID)
-        Optional<Usuario> usuarioOpt = Optional.ofNullable(usuarioService.buscarPorNombre(nombreUsuario));
-        
-        if (usuarioOpt.isPresent()) {
-            Usuario u = usuarioOpt.get();
-            u.setContrasenya(nuevaContrasenya); // Actualizamos solo la clave
-            usuarioService.guardar(u);
-        }
+ 
+            usuarioService.actualizarContraseya(nombreUsuario,nuevaContrasenya);
+
         
         return "redirect:/?actualizado=true";
     }
