@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,8 @@ public class LoginController {
 	@Autowired
 	EmailInterface emailServ;
 	
+	@Autowired
+    private BCryptPasswordEncoder encoder;
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
@@ -38,8 +41,8 @@ public class LoginController {
 	@PostMapping("/login")
 	public String login(@RequestParam String nombre, @RequestParam String contrasenya, HttpSession session) {
 		Optional<Usuario> usuario = usuarioRepository.findById(nombre);
-
-		if (usuario.isPresent() && usuario.get().getContrasenya().equals(contrasenya)) {
+		
+		if (usuario.isPresent() &&encoder.matches(contrasenya, usuario.get().getContrasenya())) {
 			session.setAttribute("usuarioLogueado", usuario.get());
 			return "redirect:/home";
 		}

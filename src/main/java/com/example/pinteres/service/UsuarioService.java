@@ -2,6 +2,8 @@ package com.example.pinteres.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.pinteres.entity.Usuario;
@@ -11,6 +13,10 @@ import com.example.pinteres.repository.UsuarioRepository;
 public class UsuarioService {
 
 	private final UsuarioRepository usuResp;
+	
+	@Autowired
+    private BCryptPasswordEncoder encoder;
+
 
 	public UsuarioService(UsuarioRepository usuResp) {
 		this.usuResp = usuResp;
@@ -18,10 +24,13 @@ public class UsuarioService {
 	}
 
 	// CREATE
-	public Usuario guardar(Usuario usuario) {
-		return usuResp.save(usuario);
-	}
-
+	public void guardar(Usuario usuario) {
+        // Hasheamos la contraseña antes de guardar en la DB
+        String passwordHasheada = encoder.encode(usuario.getContrasenya());
+        usuario.setContrasenya(passwordHasheada);
+        
+        usuResp.save(usuario);
+    }
 	// READ ALL
 	public List<Usuario> listarTodos() {
 		return usuResp.findAll();
