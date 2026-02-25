@@ -8,46 +8,107 @@
     <style>
         body { background-color: #f8f9fa; }
         .pin-card { border-radius: 16px; overflow: hidden; transition: transform 0.2s; border: none; }
-        .pin-card:hover { transform: scale(1.02); cursor: zoom-in; }
+        .pin-card:hover { transform: scale(1.02); cursor: pointer; }
         .pin-img { border-radius: 16px; width: 100%; object-fit: cover; }
-        .nav-icon { font-size: 1.8rem; color: #111; padding: 10px; }
-        .nav-icon:hover { background-color: #e9e9e9; border-radius: 50%; }
-        .active-icon { color: #cc0000 !important; }
+        
+        /* --- ESTILOS MODAL TIPO PINTEREST --- */
+        .modal-instagram .modal-dialog { max-width: 850px; }
+        .modal-instagram .modal-content { border-radius: 32px; overflow: hidden; border: none; }
+        
+        .modal-container { display: flex; min-height: 500px; }
+        
+        .modal-image-side { 
+            flex: 1.2; 
+            background-color: #f0f0f0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-image-side img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .modal-info-side { 
+            flex: 1; 
+            background: white; 
+            padding: 32px; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .user-avatar { 
+            width: 48px; height: 48px; background: #333; color: white;
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; margin-right: 12px; font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-container { flex-direction: column; }
+            .modal-image-side { height: 300px; }
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand bg-white sticky-top py-3 shadow-sm mb-4">
-		<div class="d-flex flex-column align-items-center bg-white vh-100 border-end py-3 shadow-sm" style="width: 80px; position: fixed; left: 0; top: 0;">
-		    <a th:href="@{/home}" class="mb-4 text-danger"><i class="bi bi-pinterest fs-1"></i></a>
-		    <a th:href="@{/home}" class="nav-link p-3 text-dark"><i class="bi bi-house-door fs-2"></i></a>
-		    <a th:href="@{/mis-pines}" class="nav-link p-3 text-dark"><i class="bi bi-grid fs-2"></i></a>
-		    <button class="btn p-3 text-dark" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
-		    <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
-		</div>
-		
-<div class="container-fluid d-flex justify-content-end">
-    <a th:href="@{/usuario/mi-perfil}" class="text-decoration-none">
-        <button class="btn btn-light rounded-pill border shadow-sm">
-            <i class="bi bi-person-circle"></i>
-            <span th:text="${session.usuarioLogueado.nombre}"></span>
-        </button>
-    </a>
-</div>
-
-
+    <nav class="navbar navbar-expand bg-white sticky-top py-3 mb-4">
+        <div class="d-flex flex-column align-items-center bg-white vh-100 border-end py-3 shadow-sm" style="width: 80px; position: fixed; left: 0; top: 0; z-index: 1050;">
+            <a th:href="@{/home}" class="mb-4 text-danger"><i class="bi bi-pinterest fs-1"></i></a>
+            <a th:href="@{/home}" class="nav-link p-3 text-dark"><i class="bi bi-house-door fs-2"></i></a>
+            <a th:href="@{/mis-pines}" class="nav-link p-3 text-dark"><i class="bi bi-grid fs-2"></i></a>
+            <button class="btn p-3 text-dark" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
+            <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
+        </div>
+        
+        <div class="container-fluid d-flex justify-content-end">
+            <a th:href="@{/usuario/mi-perfil}" class="text-decoration-none">
+                <button class="btn btn-light rounded-pill border shadow-sm">
+                    <i class="bi bi-person-circle"></i>
+                    <span th:text="${session.usuarioLogueado.nombre}"></span>
+                </button>
+            </a>
+        </div>
     </nav>
 
-    <div class="container">
+    <div class="container" style="padding-left: 100px;">
         <h2 class="fw-bold mb-4" th:text="${tituloPagina}"></h2>
-        
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
             <div class="col" th:each="img : ${imagenes}">
-                <div class="card pin-card shadow-sm">
+                <div class="card pin-card shadow-sm btn-open-modal" 
+                     th:data-enlace="${img.enlace}" 
+                     th:data-titulo="${img.titulo}" 
+                     th:data-autor="${img.usuario.nombre}">
                     <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
                     <div class="p-2">
                         <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
                         <p class="text-muted" style="font-size: 0.75rem;" th:text="'@' + ${img.usuario.nombre}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade modal-instagram" id="pinDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-container">
+                    <div class="modal-image-side">
+                        <img id="modalImg" src="" alt="">
+                    </div>
+                    <div class="modal-info-side">
+                        <div class="d-flex justify-content-end mb-2">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="user-avatar">
+                                <i class="bi bi-pinterest"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <span class="fw-bold d-block" id="modalAutor">@autor</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-light p-3 rounded-4">
+                            <h3 id="modalTitulo" class="fw-bold h5 m-0">Título del Pin</h3>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -62,11 +123,11 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Título</label>
-                            <input type="text" name="titulo" class="form-control rounded-pill" placeholder="¿De qué trata?" required>
+                            <input type="text" name="titulo" class="form-control rounded-pill" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">URL de la imagen</label>
-                            <input type="text" name="enlace" class="form-control rounded-pill" placeholder="Pega el link aquí" required>
+                            <input type="text" name="enlace" class="form-control rounded-pill" required>
                         </div>
                     </div>
                     <div class="modal-footer border-0">
@@ -78,5 +139,20 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const detailModal = new bootstrap.Modal(document.getElementById('pinDetailModal'));
+            const cards = document.querySelectorAll('.btn-open-modal');
+
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    document.getElementById('modalImg').src = this.getAttribute('data-enlace');
+                    document.getElementById('modalTitulo').innerText = this.getAttribute('data-titulo');
+                    document.getElementById('modalAutor').innerText = '@' + this.getAttribute('data-autor');
+                    detailModal.show();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

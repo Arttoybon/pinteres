@@ -47,41 +47,44 @@ public class UsuarioService {
 	// UPDATE
 	@Transactional
 	public Usuario actualizar(String nombreAntiguo, Usuario usuNuevos, String nuevaPass) {
-	    // 1. Buscamos el original (usamos el repo directamente para asegurar que está en el contexto)
 	    Usuario u = usuResp.findById(nombreAntiguo)
 	            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-	    // 2. Si el nombre HA CAMBIADO
 	    if (!nombreAntiguo.equals(usuNuevos.getNombre())) {
+	        // 1. Comprobar si el NUEVO nombre ya existe para evitar otro error
+	        if(usuResp.existsById(usuNuevos.getNombre())) {
+	            throw new RuntimeException("El nombre de usuario ya existe");
+	        }
+
+	        u.setCorreo("temp_" + u.getNombre() + "@mail.com");
+	        usuResp.saveAndFlush(u); 
+
+	        // 3. Crear el nuevo usuario
 	        Usuario nuevoUsuario = new Usuario();
+	        nuevoUsuario.setNombre(usuNuevos.getNombre());
+	        nuevoUsuario.setCorreo(usuNuevos.getCorreo()); // Aquí ya no chocará
 	        
-	        // ASIGNAMOS EL ID MANUALMENTE ANTES DE NADA
-	        nuevoUsuario.setNombre(usuNuevos.getNombre()); 
-	        nuevoUsuario.setCorreo(usuNuevos.getCorreo());
-	        
-	        // Gestionar contraseña
 	        if (nuevaPass != null && !nuevaPass.trim().isEmpty()) {
 	            nuevoUsuario.setContrasenya(encoder.encode(nuevaPass));
 	        } else {
 	            nuevoUsuario.setContrasenya(u.getContrasenya());
 	        }
 
-	        // Mover galería: Actualizamos la relación hijo -> padre
-	        if (u.getGaleria() != null && !u.getGaleria().isEmpty()) {
+	        // 4. Mover fotos
+	        if (u.getGaleria() != null) {
 	            for (Imagen img : u.getGaleria()) {
 	                img.setUsuario(nuevoUsuario);
 	            }
 	            nuevoUsuario.setGaleria(u.getGaleria());
 	        }
 
-	        // OPERACIÓN CRÍTICA:
-	        usuResp.save(nuevoUsuario); // Guardamos el nuevo primero
-	        usuResp.flush();            // Forzamos a Hibernate a escribirlo YA
-	        usuResp.delete(u);          // Ahora borramos el viejo con seguridad
+	        // 5. Guardar el nuevo y borrar el viejo definitivamente
+	        Usuario guardado = usuResp.save(nuevoUsuario);
+	        usuResp.delete(u);
 	        
-	        return nuevoUsuario;
+	        return guardado;
 	    } else {
-	        // 3. Si el nombre es igual, actualización estándar
+	        // Si el nombre es igual, solo actualizamos los campos normales
 	        u.setCorreo(usuNuevos.getCorreo());
 	        if (nuevaPass != null && !nuevaPass.trim().isEmpty()) {
 	            u.setContrasenya(encoder.encode(nuevaPass));
@@ -101,8 +104,12 @@ public class UsuarioService {
 	}
 
 	// DELETE
-	public void borrar(String nombre) {
-		usuResp.deleteById(nombre);
+	@Transactional
+	public void eliminarCuenta(String nombre) {
+	    Usuario u = buscarPorNombre(nombre);
+	    // JPA se encargará de borrar las imágenes si tienes CascadeType.ALL
+	    // o de ponerlas a null si así lo configuraste.
+	    usuResp.delete(u);
 	}
 
 }
