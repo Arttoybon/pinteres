@@ -1,4 +1,4 @@
-package com.example.pinteres.service.implement;
+package com.example.pinteres.service;
 
 import com.example.pinteres.entity.Email;
 

@@ -7,7 +7,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.example.pinteres.entity.Email;
-import com.example.pinteres.service.implement.EmailInterface;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.pinteres.entity.Email;
 import com.example.pinteres.entity.Usuario;
 import com.example.pinteres.repository.UsuarioRepository;
-import com.example.pinteres.service.implement.EmailInterface;
+import com.example.pinteres.service.EmailInterface;
 
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
