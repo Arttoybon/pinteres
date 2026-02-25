@@ -58,7 +58,7 @@ public class LoginController {
 			 if (usuario.isPresent()) {
 				 Email emai = new Email(usuario.get().getCorreo(),"Recuperación de correo","Entra en el siguiente "
 				 		+ "enlace para restablecer tu contraseña.",
-				 		"http://localhost:8080/usuario/cambiar-password?id="+usuario.get().getNombre());
+				 		"https://unopportunely-cindery-merna.ngrok-free.dev/usuario/cambiar-password?id="+usuario.get().getNombre());
 					emailServ.sendMail(emai);
 			 }else {
 			        // Importante: Para que el error se vea en el index tras un redirect, 
