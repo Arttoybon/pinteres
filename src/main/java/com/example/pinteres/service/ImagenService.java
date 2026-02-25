@@ -53,19 +53,29 @@ public class ImagenService {
 		imgRep.deleteById(id);
 	}
 	
-	// Añade esto a ImagenService.java
-	public void toggleLike(Long imagenId, String nombreUsuario) {
+	public boolean toggleLike(Long imagenId, String nombreUsuario) {
 	    Usuario usuario = usuResp.findById(nombreUsuario)
 	        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 	    Imagen imagen = imgRep.findById(imagenId)
 	        .orElseThrow(() -> new RuntimeException("Imagen no encontrada"));
 
+	    boolean guardado;
 	    if (usuario.getGuardados().contains(imagen)) {
 	        usuario.getGuardados().remove(imagen);
+	        guardado = false;
 	    } else {
 	        usuario.getGuardados().add(imagen);
+	        guardado = true;
 	    }
 	    usuResp.save(usuario);
+	    return guardado; // Devolvemos el estado actual
+	}
+
+	// Necesitas este método extra para saber el estado inicial al cargar las fotos
+	public boolean estaGuardado(Long imagenId, String nombreUsuario) {
+	    Usuario usuario = usuResp.findById(nombreUsuario).orElse(null);
+	    if (usuario == null) return false;
+	    return usuario.getGuardados().stream().anyMatch(img -> img.getId().equals(imagenId));
 	}
 
 	// Para listar solo las guardadas
@@ -73,5 +83,7 @@ public class ImagenService {
 	    Usuario usuario = usuResp.findById(nombreUsuario).get();
 	    return usuario.getGuardados();
 	}
+	
 
+	
 }

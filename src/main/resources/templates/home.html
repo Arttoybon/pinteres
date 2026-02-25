@@ -12,16 +12,62 @@
         body { background-color: #f8f9fa; }
         .pin-card { border-radius: 16px; overflow: hidden; transition: transform 0.2s; border: none; }
         .pin-card:hover { transform: scale(1.02); cursor: pointer; }
-        .pin-img { border-radius: 16px; width: 100%; object-fit: cover; }
+        .pin-img { border-radius: 16px; width: 100%; height: auto; object-fit: cover; }
         
         /* --- ESTILOS MODAL TIPO PINTEREST --- */
         .modal-instagram .modal-dialog { max-width: 850px; }
         .modal-instagram .modal-content { border-radius: 32px; overflow: hidden; border: none; }
         .modal-container { display: flex; min-height: 500px; }
-        .modal-image-side { flex: 1.2; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; }
+        
+        .modal-image-side { 
+            flex: 1.2; 
+            background-color: #f0f0f0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            overflow: hidden;
+            cursor: pointer;
+        }
         .modal-image-side img { width: 100%; height: 100%; object-fit: cover; }
         .modal-info-side { flex: 1; background: white; padding: 32px; display: flex; flex-direction: column; }
         .user-avatar { width: 48px; height: 48px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.5rem; }
+
+        /* --- ANIMACIONES --- */
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .pulse-animation { animation: heartPulse 0.3s ease-out; }
+
+        /* Corazón gigante corregido */
+        .floating-heart {
+            position: absolute;
+            color: white;
+            font-size: 5rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            text-shadow: 0 0 20px rgba(0,0,0,0.3);
+            display: none; /* Oculto por defecto */
+        }
+        @keyframes heartIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        .animate-heart { display: block !important; animation: heartIn 0.8s ease-out forwards; }
+        
+        /* Botón de la esquina inferior derecha */
+        #likeBtn { 
+            width: 65px; height: 65px; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            margin-bottom: -10px; /* Ajuste para pegarlo a la esquina */
+            margin-right: -10px;
+        }
+        #likeBtn:active { transform: scale(0.9); }
 
         @media (max-width: 768px) {
             .modal-container { flex-direction: column; }
@@ -60,7 +106,8 @@
                      th:data-id="${img.id}"
                      th:data-enlace="${img.enlace}" 
                      th:data-titulo="${img.titulo}" 
-                     th:data-autor="${img.usuario.nombre}">
+                     th:data-autor="${img.usuario.nombre}"
+                     th:data-guardada="${imagenService.estaGuardado(img.id, session.usuarioLogueado.nombre)}">
                     <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
                     <div class="p-2">
                         <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
@@ -75,7 +122,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-container">
-                    <div class="modal-image-side">
+                    <div class="modal-image-side" id="modalImageContainer">
+                        <i class="bi bi-heart-fill floating-heart" id="giantHeart"></i>
                         <img id="modalImg" src="" alt="">
                     </div>
                     <div class="modal-info-side">
@@ -89,9 +137,9 @@
                         <div class="bg-light p-3 rounded-4 mb-4">
                             <h3 id="modalTitulo" class="fw-bold h5 m-0">Título del Pin</h3>
                         </div>
-                        <div class="mt-auto d-grid">
-                            <button id="likeBtn" class="btn btn-outline-danger rounded-pill py-2 fw-bold shadow-sm">
-                                <i class="bi bi-heart-fill me-2"></i> Me gusta / Guardar
+                        <div class="mt-auto d-flex justify-content-end">
+                            <button id="likeBtn" class="btn rounded-circle shadow-sm border p-0">
+                                <i id="likeIcon" class="bi bi-heart fs-2"></i>
                             </button>
                         </div>
                     </div>
@@ -131,7 +179,7 @@
             <div class="d-flex">
                 <div class="toast-body">
                     <i class="bi bi-check-circle-fill text-success me-2"></i> 
-                    Se ha guardado todo correctamente.
+                    ¡Guardado en tus favoritos!
                 </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
@@ -145,47 +193,79 @@
             const saveToast = new bootstrap.Toast(document.getElementById('saveToast'));
             const cards = document.querySelectorAll('.btn-open-modal');
             const likeBtn = document.getElementById('likeBtn');
+            const likeIcon = document.getElementById('likeIcon');
+            const modalImageContainer = document.getElementById('modalImageContainer');
+            const giantHeart = document.getElementById('giantHeart');
             
-            // Obtener valores CSRF para Spring Security
             const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
             
             let currentId = null;
 
+            function actualizarEstadoBoton(estaGuardado) {
+                if (estaGuardado) {
+                    likeBtn.classList.remove('btn-light', 'text-danger');
+                    likeBtn.classList.add('btn-danger', 'text-white');
+                    likeIcon.classList.replace('bi-heart', 'bi-heart-fill');
+                    
+                    likeBtn.classList.remove('pulse-animation');
+                    void likeBtn.offsetWidth; 
+                    likeBtn.classList.add('pulse-animation');
+                } else {
+                    likeBtn.classList.remove('btn-danger', 'text-white', 'pulse-animation');
+                    likeBtn.classList.add('btn-light', 'text-danger');
+                    likeIcon.classList.replace('bi-heart-fill', 'bi-heart');
+                }
+            }
+
             cards.forEach(card => {
                 card.addEventListener('click', function() {
                     currentId = this.getAttribute('data-id');
+                    const guardado = this.getAttribute('data-guardada') === 'true';
+                    
+                    // LIMPIEZA: Quitamos la animación para que no salga al abrir
+                    giantHeart.classList.remove('animate-heart');
+                    
                     document.getElementById('modalImg').src = this.getAttribute('data-enlace');
                     document.getElementById('modalTitulo').innerText = this.getAttribute('data-titulo');
                     document.getElementById('modalAutor').innerText = '@' + this.getAttribute('data-autor');
-                    
-                    // Reset visual del botón
-                    likeBtn.classList.remove('btn-danger');
-                    likeBtn.classList.add('btn-outline-danger');
-                    
+                    actualizarEstadoBoton(guardado);
                     detailModal.show();
                 });
             });
 
+            // Lógica de Doble Clic Corregida
+            modalImageContainer.addEventListener('dblclick', function() {
+                const cardOriginal = document.querySelector(`.pin-card[data-id="${currentId}"]`);
+                if (cardOriginal.getAttribute('data-guardada') !== 'true') {
+                    likeBtn.click();
+                }
+                
+                // Reiniciar y disparar animación
+                giantHeart.classList.remove('animate-heart');
+                void giantHeart.offsetWidth; // Reflow para reiniciar animación CSS
+                giantHeart.classList.add('animate-heart');
+                
+                // Limpiar después de la animación
+                setTimeout(() => {
+                    giantHeart.classList.remove('animate-heart');
+                }, 800);
+            });
+
             likeBtn.addEventListener('click', function() {
                 if (!currentId) return;
-
                 fetch('/like/' + currentId, { 
                     method: 'POST',
-                    headers: {
-                        [csrfHeader]: csrfToken
-                    }
+                    headers: { [csrfHeader]: csrfToken }
                 })
-                .then(response => {
-                    if (response.ok) {
-                        this.classList.toggle('btn-outline-danger');
-                        this.classList.toggle('btn-danger');
-                        if(this.classList.contains('btn-danger')) {
-                            saveToast.show();
-                        }
-                    }
+                .then(response => response.json())
+                .then(nuevoEstado => {
+                    actualizarEstadoBoton(nuevoEstado);
+                    const cardOriginal = document.querySelector(`.pin-card[data-id="${currentId}"]`);
+                    cardOriginal.setAttribute('data-guardada', nuevoEstado);
+                    if(nuevoEstado) saveToast.show();
                 })
-                .catch(err => console.error("Error al guardar:", err));
+                .catch(err => console.error("Error:", err));
             });
         });
     </script>

@@ -1,2 +1,2 @@
--borrar publicaciones al borrar el usuario
--poder imagenes desde el home al pulsarle
+-buscar usuario 
+-ver perfil de otros usuarios

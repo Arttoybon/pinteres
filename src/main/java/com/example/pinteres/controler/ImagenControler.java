@@ -29,12 +29,17 @@ public class ImagenControler {
 
 	@GetMapping("/home")
 	public String home(Model model, HttpSession session) {
-		if (session.getAttribute("usuarioLogueado") == null) {
-			return "redirect:/";
-		}
-		model.addAttribute("imagenes", imagenService.listarTodas());
-		model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-		return "home";
+	    if (session.getAttribute("usuarioLogueado") == null) {
+	        return "redirect:/";
+	    }
+	    
+	    model.addAttribute("imagenes", imagenService.listarTodas());
+	    model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
+	    
+	    // AÑADE ESTA LÍNEA:
+	    model.addAttribute("imagenService", imagenService); 
+	    
+	    return "home";
 	}
 
 	@PostMapping("/publicar")
@@ -75,13 +80,13 @@ public class ImagenControler {
 	// Añade estos métodos a ImagenControler.java
 
 	@PostMapping("/like/{id}")
-	@ResponseBody // Para que responda sin recargar la página
-	public String toggleLike(@PathVariable Long id, HttpSession session) {
+	@ResponseBody
+	public boolean toggleLike(@PathVariable Long id, HttpSession session) {
 	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-	    if (user == null) return "error";
+	    if (user == null) return false;
 	    
-	    imagenService.toggleLike(id, user.getNombre());
-	    return "ok";
+	    // Modificaremos el service para que devuelva si tras el click está guardado o no
+	    return imagenService.toggleLike(id, user.getNombre());
 	}
 
 	@GetMapping("/mis-guardados")
@@ -90,7 +95,11 @@ public class ImagenControler {
 	    if (user == null) return "redirect:/";
 
 	    model.addAttribute("imagenes", imagenService.listarGuardadas(user.getNombre()));
-	    model.addAttribute("tituloPagina", "Mis Guardados");
-	    return "home"; // Reutilizamos home.html ya que la galería es igual
+	    model.addAttribute("tituloPagina", "Mis Favoritos");
+	    
+	    // ESTA LÍNEA ES LA QUE FALTA:
+	    model.addAttribute("imagenService", imagenService); 
+
+	    return "home"; 
 	}
 }
