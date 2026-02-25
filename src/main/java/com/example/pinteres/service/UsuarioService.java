@@ -6,8 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.pinteres.entity.Imagen;
 import com.example.pinteres.entity.Usuario;
 import com.example.pinteres.repository.UsuarioRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UsuarioService {
@@ -42,13 +45,49 @@ public class UsuarioService {
 	}
 
 	// UPDATE
-	public Usuario actualizar(Usuario usu) {
-		Usuario u = buscarPorNombre(usu.getNombre());
+	@Transactional
+	public Usuario actualizar(String nombreAntiguo, Usuario usuNuevos, String nuevaPass) {
+	    // 1. Buscamos el original (usamos el repo directamente para asegurar que está en el contexto)
+	    Usuario u = usuResp.findById(nombreAntiguo)
+	            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-		u.setCorreo(usu.getCorreo());
-		u.setContrasenya(usu.getContrasenya());
+	    // 2. Si el nombre HA CAMBIADO
+	    if (!nombreAntiguo.equals(usuNuevos.getNombre())) {
+	        Usuario nuevoUsuario = new Usuario();
+	        
+	        // ASIGNAMOS EL ID MANUALMENTE ANTES DE NADA
+	        nuevoUsuario.setNombre(usuNuevos.getNombre()); 
+	        nuevoUsuario.setCorreo(usuNuevos.getCorreo());
+	        
+	        // Gestionar contraseña
+	        if (nuevaPass != null && !nuevaPass.trim().isEmpty()) {
+	            nuevoUsuario.setContrasenya(encoder.encode(nuevaPass));
+	        } else {
+	            nuevoUsuario.setContrasenya(u.getContrasenya());
+	        }
 
-		return usuResp.save(u);
+	        // Mover galería: Actualizamos la relación hijo -> padre
+	        if (u.getGaleria() != null && !u.getGaleria().isEmpty()) {
+	            for (Imagen img : u.getGaleria()) {
+	                img.setUsuario(nuevoUsuario);
+	            }
+	            nuevoUsuario.setGaleria(u.getGaleria());
+	        }
+
+	        // OPERACIÓN CRÍTICA:
+	        usuResp.save(nuevoUsuario); // Guardamos el nuevo primero
+	        usuResp.flush();            // Forzamos a Hibernate a escribirlo YA
+	        usuResp.delete(u);          // Ahora borramos el viejo con seguridad
+	        
+	        return nuevoUsuario;
+	    } else {
+	        // 3. Si el nombre es igual, actualización estándar
+	        u.setCorreo(usuNuevos.getCorreo());
+	        if (nuevaPass != null && !nuevaPass.trim().isEmpty()) {
+	            u.setContrasenya(encoder.encode(nuevaPass));
+	        }
+	        return usuResp.save(u);
+	    }
 	}
 
 	// UPDATE

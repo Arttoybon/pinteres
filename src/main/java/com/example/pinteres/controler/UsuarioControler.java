@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +21,6 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/usuario")
 public class UsuarioControler {
-
-	@Autowired
-	private PasswordEncoder encoder; // Para encriptar la nueva clave
 
 	@Autowired
 	private UsuarioService usuarioService;
@@ -121,26 +117,26 @@ public class UsuarioControler {
 	}
 
 	@PostMapping("/actualizar-perfil")
-	public String procesarActualizacion(@ModelAttribute Usuario datosNuevos,
-			@RequestParam(required = false) String nuevaPass, HttpSession session) {
+	public String procesarActualizacion(@RequestParam String nuevoNombre,
+	                                   @RequestParam String correo,
+	                                   @RequestParam(required = false) String nuevaPass,
+	                                   HttpSession session) {
+	    
+	    Usuario logueado = (Usuario) session.getAttribute("usuarioLogueado");
+	    if (logueado == null) return "redirect:/";
 
-		Usuario logeado = (Usuario) session.getAttribute("usuarioLogueado");
-		if (logeado == null)
-			return "redirect:/";
+	    // Creamos un objeto temporal solo para transportar los datos al service
+	    Usuario datosNuevos = new Usuario();
+	    datosNuevos.setNombre(nuevoNombre);
+	    datosNuevos.setCorreo(correo);
 
-		// Actualizamos los datos básicos
-		logeado.setCorreo(datosNuevos.getCorreo());
+	    // Llamamos al service corregido
+	    Usuario actualizado = usuarioService.actualizar(logueado.getNombre(), datosNuevos, nuevaPass);
 
-		// Si escribió una nueva contraseña, la encriptamos antes de guardar
-		if (nuevaPass != null && !nuevaPass.trim().isEmpty()) {
-			logeado.setContrasenya(encoder.encode(nuevaPass));
-		}
-
-		// Guardamos en DB y actualizamos la sesión para que los cambios se vean ya
-		usuarioService.guardar(logeado);
-		session.setAttribute("usuarioLogueado", logeado);
-
-		return "redirect:/usuario/mi-perfil?exito=true";
+	    // Actualizamos la sesión para que el resto de la web sepa que ahora te llamas distinto
+	    session.setAttribute("usuarioLogueado", actualizado);
+	    
+	    return "redirect:/home?exito=true";
 	}
 
 }
