@@ -1,9 +1,11 @@
 package com.example.pinteres.controler;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.pinteres.entity.Usuario;
 import com.example.pinteres.service.UsuarioService;
-
-import org.springframework.ui.Model;
 
 @Controller
 @RequestMapping("/usuario")
@@ -59,12 +59,39 @@ public class UsuarioControler {
         }
     }
 
- // Cambia Long id por String id
     @GetMapping("/cambiar-password")
-    public String mostrarPantallaCambio(@RequestParam("id") String id, Model model) {
-        // Buscamos al usuario para pasar sus datos al formulario si fuera necesario
-        model.addAttribute("userId", id);
-        return "formulario-cambio"; // Asegúrate de que este archivo exista en templates
+    public String mostrarPantallaCambio(
+            @RequestParam("token") String tokenRecibido, 
+            @RequestParam("u") String nombreHasheadoRecibido, 
+            Model model) {
+        
+        List<Usuario> todosLosUsuarios = usuarioService.listarTodos();
+        Usuario usuarioEncontrado = null;
+
+        for (Usuario u : todosLosUsuarios) {
+            // Generamos el hash del nombre usando UTF_8 para evitar errores de encoding
+            String hashNombreDB = org.springframework.util.DigestUtils.md5DigestAsHex(
+                    u.getNombre().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+       
+            if (hashNombreDB.equals(nombreHasheadoRecibido)) {
+                usuarioEncontrado = u;
+                break;
+            }
+        }
+
+        if (usuarioEncontrado != null) {
+            // Generamos el token de la contraseña usando UTF_8
+            String tokenEsperado = org.springframework.util.DigestUtils.md5DigestAsHex(
+                    usuarioEncontrado.getContrasenya().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+
+            if (tokenEsperado.equals(tokenRecibido)) {
+                model.addAttribute("userId", usuarioEncontrado.getNombre());
+                return "formulario-cambio"; 
+            }
+        }
+        
+        return "redirect:/?enlaceInvalido=true";
     }
     
     @PostMapping("/actualizar-contraseya")

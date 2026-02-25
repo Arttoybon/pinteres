@@ -1,5 +1,6 @@
 package com.example.pinteres.controler;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,26 +51,45 @@ public class LoginController {
 		session.invalidate();
 		return "redirect:/";
 	}
-	
 	@PostMapping("/recuperar-password")
-	public String sendEmail(@RequestParam("usuario")String nombre ) {
-		try {
-			Optional<Usuario> usuario = usuarioRepository.findById(nombre);
-			 if (usuario.isPresent()) {
-				 Email emai = new Email(usuario.get().getCorreo(),"Recuperación de correo","Entra en el siguiente "
-				 		+ "enlace para restablecer tu contraseña.",
-				 		"https://unopportunely-cindery-merna.ngrok-free.dev/usuario/cambiar-password?id="+usuario.get().getNombre());
-					emailServ.sendMail(emai);
-			 }else {
-			        // Importante: Para que el error se vea en el index tras un redirect, 
-			        // suele ser mejor usar redirect:/?errorUsuario=true
-			        return "redirect:/?noexiste=true";
-			    }
-			
-		} catch (MessagingException e) {
-			e.printStackTrace();
-		}
-		return "redirect:/?recuperado=true";
+	public String sendEmail(@RequestParam("usuario") String nombre) {
+	    try {
+	        Optional<Usuario> usuarioOpt = usuarioRepository.findById(nombre);
+	        
+	        if (usuarioOpt.isPresent()) {
+	            Usuario usuario = usuarioOpt.get();
+	            
+	            // 1. Obtenemos el hash de BCrypt que ya está en la base de datos
+	            String hashActual = usuario.getContrasenya();
+	          //  String usuarioHasheada = encoder.encode(usuario.getNombre());
+	            // 2. Lo convertimos a Hexadecimal para que la URL sea segura (sin $, / ni .)
+	            String tokenHex = org.springframework.util.DigestUtils.md5DigestAsHex(hashActual.getBytes(StandardCharsets.UTF_8));
+	            String tokenHexu = org.springframework.util.DigestUtils.md5DigestAsHex(usuario.getNombre().getBytes(StandardCharsets.UTF_8));
+	            // 3. Construimos la nueva URL con el token y el nombre
+	            String urlConToken = "https://unopportunely-cindery-merna.ngrok-free.dev/usuario/cambiar-password"
+	                    + "?token=" + tokenHex 
+	                    + "&u=" + tokenHexu;
+
+	            // 4. Configuramos y enviamos el email
+	            Email emai = new Email(
+	                usuario.getCorreo(),
+	                "Recuperación de contraseña",
+	                "Has solicitado restablecer tu contraseña. Haz clic en el botón para continuar. "
+	                + "Este enlace solo funcionará una vez.",
+	                urlConToken
+	            );
+	            
+	            emailServ.sendMail(emai);
+	            return "redirect:/?recuperado=true";
+	            
+	        } else {
+	            return "redirect:/?noexiste=true";
+	        }
+	        
+	    } catch (MessagingException e) {
+	        e.printStackTrace();
+	        return "redirect:/?error=true";
+	    }
 	}
 	
 }
