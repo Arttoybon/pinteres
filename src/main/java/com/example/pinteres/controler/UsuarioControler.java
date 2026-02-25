@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -102,17 +103,24 @@ public class UsuarioControler {
 
 	@GetMapping("/mi-perfil")
 	public String mostrarPerfil(HttpSession session, Model model) {
-		// 1. Sacamos al usuario de la sesión
-		Usuario logeado = (Usuario) session.getAttribute("usuarioLogueado");
+	    // 1. Obtenemos el usuario básico de la sesión
+	    Usuario logeado = (Usuario) session.getAttribute("usuarioLogueado");
 
-		// 2. Si no hay nadie, al login
-		if (logeado == null) {
-			return "redirect:/?error=sesion_expirada";
-		}
+	    if (logeado == null) {
+	        return "redirect:/?error=sesion_expirada";
+	    }
 
-		// 3. Pasamos los datos al HTML
-		model.addAttribute("usuario", logeado);
-		return "perfil-usuario";
+	    // 2. IMPORTANTE: Buscamos al usuario de nuevo en la DB para que 
+	    // su 'galeria' esté disponible y no de error de Hibernate.
+	    Usuario usuarioCompleto = usuarioService.buscarPorNombre(logeado.getNombre());
+
+	    // 3. Pasamos los datos necesarios al HTML
+	    model.addAttribute("usuario", usuarioCompleto);
+	    model.addAttribute("esMiPerfil", true);
+	    // Pasamos la lista de sus publicaciones (sus "pines")
+	    model.addAttribute("publicaciones", usuarioCompleto.getGaleria()); 
+	    
+	    return "perfil-usuario";
 	}
 
 	@PostMapping("/actualizar-perfil")
@@ -151,4 +159,25 @@ public class UsuarioControler {
 	    return "redirect:/?cuentaEliminada=true";
 	}
 	
+	@GetMapping("/perfil/{nombre}")
+	public String verPerfilPublico(@PathVariable String nombre, HttpSession session, Model model) {
+	    // 1. Buscamos el usuario que se quiere visitar
+	    Usuario usuarioAVisitar = usuarioService.buscarPorNombre(nombre);
+	    
+	    if (usuarioAVisitar == null) {
+	        return "redirect:/home?error=usuario_no_encontrado";
+	    }
+
+	    // 2. Obtenemos el usuario logueado de la sesión (para comparar)
+	    Usuario logeado = (Usuario) session.getAttribute("usuarioLogueado");
+
+	    // 3. Pasamos ambos al modelo
+	    model.addAttribute("usuario", usuarioAVisitar);
+	    model.addAttribute("esMiPerfil", logeado != null && logeado.getNombre().equals(usuarioAVisitar.getNombre()));
+	    
+	    // 4. Pasamos su galería de imágenes
+	    model.addAttribute("publicaciones", usuarioAVisitar.getGaleria());
+
+	    return "perfil-usuario";
+	}
 }

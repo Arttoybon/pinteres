@@ -34,10 +34,10 @@
         .user-avatar { width: 48px; height: 48px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.5rem; }
 
 		@media (min-width: 768px) {
-    .container-principal {
-        padding-left: 100px !important;
-    }
-}
+            .container-principal {
+                padding-left: 100px !important;
+            }
+        }
 
         /* --- ANIMACIONES --- */
         @keyframes heartPulse {
@@ -47,7 +47,6 @@
         }
         .pulse-animation { animation: heartPulse 0.3s ease-out; }
 
-        /* Corazón gigante corregido */
         .floating-heart {
             position: absolute;
             color: white;
@@ -56,7 +55,7 @@
             pointer-events: none;
             z-index: 10;
             text-shadow: 0 0 20px rgba(0,0,0,0.3);
-            display: none; /* Oculto por defecto */
+            display: none; 
         }
         @keyframes heartIn {
             0% { transform: scale(0); opacity: 0; }
@@ -65,12 +64,11 @@
         }
         .animate-heart { display: block !important; animation: heartIn 0.8s ease-out forwards; }
         
-        /* Botón de la esquina inferior derecha */
         #likeBtn { 
             width: 65px; height: 65px; 
             display: flex; align-items: center; justify-content: center;
             transition: all 0.2s ease;
-            margin-bottom: -10px; /* Ajuste para pegarlo a la esquina */
+            margin-bottom: -10px; 
             margin-right: -10px;
         }
         #likeBtn:active { transform: scale(0.9); }
@@ -91,13 +89,11 @@
         <a th:href="@{/mis-pines}" class="nav-link p-3 text-dark"><i class="bi bi-grid fs-2"></i></a>
         <a th:href="@{/mis-guardados}" class="nav-link p-3 text-dark"><i class="bi bi-heart fs-2 text-danger"></i></a>
         <button class="btn p-3 text-dark" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
-        
         <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
     </div>
     
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <a th:href="@{/home}" class="d-md-none text-danger ms-2"><i class="bi bi-pinterest fs-2"></i></a>
-
         <div class="d-flex align-items-center ms-auto">
             <a th:href="@{/usuario/mi-perfil}" class="text-decoration-none me-2">
                 <button class="btn btn-light rounded-pill border shadow-sm d-flex align-items-center gap-2">
@@ -105,7 +101,6 @@
                     <span th:text="${session.usuarioLogueado.nombre}"></span>
                 </button>
             </a>
-            
             <a th:href="@{/logout}" class="btn btn-outline-danger rounded-circle d-md-none ms-2">
                 <i class="bi bi-box-arrow-right"></i>
             </a>
@@ -114,175 +109,180 @@
 </nav>
 
 <div class="container ps-3 ps-md-5" style="padding-left: 0;">
-        <h2 class="fw-bold mb-4" th:text="${tituloPagina}"></h2>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-            <div class="col" th:each="img : ${imagenes}">
-                <div class="card pin-card shadow-sm btn-open-modal" 
-                     th:data-id="${img.id}"
-                     th:data-enlace="${img.enlace}" 
-                     th:data-titulo="${img.titulo}" 
-                     th:data-autor="${img.usuario.nombre}"
-                     th:data-guardada="${imagenService.estaGuardado(img.id, session.usuarioLogueado.nombre)}">
-                    <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
-                    <div class="p-2">
-                        <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
-                        <p class="text-muted" style="font-size: 0.75rem;" th:text="'@' + ${img.usuario.nombre}"></p>
+    <h2 class="fw-bold mb-4" th:text="${tituloPagina}"></h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="col" th:each="img : ${imagenes}">
+            <div class="card pin-card shadow-sm btn-open-modal" 
+                 th:data-id="${img.id}"
+                 th:data-enlace="${img.enlace}" 
+                 th:data-titulo="${img.titulo}" 
+                 th:data-autor="${img.usuario.nombre}"
+                 th:data-guardada="${imagenService.estaGuardado(img.id, session.usuarioLogueado.nombre)}">
+                <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
+                <div class="p-2">
+                    <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;">
+                        <a th:href="@{/usuario/perfil/{nombre}(nombre=${img.usuario.nombre})}" 
+                           th:text="'@' + ${img.usuario.nombre}" 
+                           class="text-decoration-none text-muted fw-bold"
+                           onclick="event.stopPropagation();"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-instagram" id="pinDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-container">
+                <div class="modal-image-side" id="modalImageContainer">
+                    <i class="bi bi-heart-fill floating-heart" id="giantHeart"></i>
+                    <img id="modalImg" src="" alt="">
+                </div>
+                <div class="modal-info-side">
+                    <div class="d-flex justify-content-end mb-2">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="user-avatar"><i class="bi bi-pinterest"></i></div>
+                        <div class="flex-grow-1">
+                            <a id="linkPerfilModal" href="#" class="text-decoration-none text-dark">
+                                <span class="fw-bold d-block" id="modalAutor">@autor</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="bg-light p-3 rounded-4 mb-4">
+                        <h3 id="modalTitulo" class="fw-bold h5 m-0">Título del Pin</h3>
+                    </div>
+                    <div class="mt-auto d-flex justify-content-end">
+                        <button id="likeBtn" class="btn rounded-circle shadow-sm border p-0">
+                            <i id="likeIcon" class="bi bi-heart fs-2"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal fade modal-instagram" id="pinDetailModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-container">
-                    <div class="modal-image-side" id="modalImageContainer">
-                        <i class="bi bi-heart-fill floating-heart" id="giantHeart"></i>
-                        <img id="modalImg" src="" alt="">
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Crear Pin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/publicar}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Título</label>
+                        <input type="text" name="titulo" class="form-control rounded-pill" required>
                     </div>
-                    <div class="modal-info-side">
-                        <div class="d-flex justify-content-end mb-2">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="user-avatar"><i class="bi bi-pinterest"></i></div>
-                            <div class="flex-grow-1"><span class="fw-bold d-block" id="modalAutor">@autor</span></div>
-                        </div>
-                        <div class="bg-light p-3 rounded-4 mb-4">
-                            <h3 id="modalTitulo" class="fw-bold h5 m-0">Título del Pin</h3>
-                        </div>
-                        <div class="mt-auto d-flex justify-content-end">
-                            <button id="likeBtn" class="btn rounded-circle shadow-sm border p-0">
-                                <i id="likeIcon" class="bi bi-heart fs-2"></i>
-                            </button>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">URL de la imagen</label>
+                        <input type="text" name="enlace" class="form-control rounded-pill" required>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="uploadModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Crear Pin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold">Publicar</button>
                 </div>
-                <form th:action="@{/publicar}" method="post">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Título</label>
-                            <input type="text" name="titulo" class="form-control rounded-pill" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">URL de la imagen</label>
-                            <input type="text" name="enlace" class="form-control rounded-pill" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold">Publicar</button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="saveToast" class="toast align-items-center text-white bg-dark border-0 rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-check-circle-fill text-success me-2"></i> 
-                    ¡Guardado en tus favoritos!
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="saveToast" class="toast align-items-center text-white bg-dark border-0 rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill text-success me-2"></i> 
+                ¡Guardado en tus favoritos!
             </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-toast="dismiss"></button>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const detailModal = new bootstrap.Modal(document.getElementById('pinDetailModal'));
-            const saveToast = new bootstrap.Toast(document.getElementById('saveToast'));
-            const cards = document.querySelectorAll('.btn-open-modal');
-            const likeBtn = document.getElementById('likeBtn');
-            const likeIcon = document.getElementById('likeIcon');
-            const modalImageContainer = document.getElementById('modalImageContainer');
-            const giantHeart = document.getElementById('giantHeart');
-            
-            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-            
-            let currentId = null;
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const detailModal = new bootstrap.Modal(document.getElementById('pinDetailModal'));
+        const saveToast = new bootstrap.Toast(document.getElementById('saveToast'));
+        const cards = document.querySelectorAll('.btn-open-modal');
+        const likeBtn = document.getElementById('likeBtn');
+        const likeIcon = document.getElementById('likeIcon');
+        const modalImageContainer = document.getElementById('modalImageContainer');
+        const giantHeart = document.getElementById('giantHeart');
+        
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+        
+        let currentId = null;
 
-            function actualizarEstadoBoton(estaGuardado) {
-                if (estaGuardado) {
-                    likeBtn.classList.remove('btn-light', 'text-danger');
-                    likeBtn.classList.add('btn-danger', 'text-white');
-                    likeIcon.classList.replace('bi-heart', 'bi-heart-fill');
-                    
-                    likeBtn.classList.remove('pulse-animation');
-                    void likeBtn.offsetWidth; 
-                    likeBtn.classList.add('pulse-animation');
-                } else {
-                    likeBtn.classList.remove('btn-danger', 'text-white', 'pulse-animation');
-                    likeBtn.classList.add('btn-light', 'text-danger');
-                    likeIcon.classList.replace('bi-heart-fill', 'bi-heart');
-                }
+        function actualizarEstadoBoton(estaGuardado) {
+            if (estaGuardado) {
+                likeBtn.classList.remove('btn-light', 'text-danger');
+                likeBtn.classList.add('btn-danger', 'text-white');
+                likeIcon.classList.replace('bi-heart', 'bi-heart-fill');
+                likeBtn.classList.remove('pulse-animation');
+                void likeBtn.offsetWidth; 
+                likeBtn.classList.add('pulse-animation');
+            } else {
+                likeBtn.classList.remove('btn-danger', 'text-white', 'pulse-animation');
+                likeBtn.classList.add('btn-light', 'text-danger');
+                likeIcon.classList.replace('bi-heart-fill', 'bi-heart');
             }
+        }
 
-            cards.forEach(card => {
-                card.addEventListener('click', function() {
-                    currentId = this.getAttribute('data-id');
-                    const guardado = this.getAttribute('data-guardada') === 'true';
-                    
-                    // LIMPIEZA: Quitamos la animación para que no salga al abrir
-                    giantHeart.classList.remove('animate-heart');
-                    
-                    document.getElementById('modalImg').src = this.getAttribute('data-enlace');
-                    document.getElementById('modalTitulo').innerText = this.getAttribute('data-titulo');
-                    document.getElementById('modalAutor').innerText = '@' + this.getAttribute('data-autor');
-                    actualizarEstadoBoton(guardado);
-                    detailModal.show();
-                });
-            });
-
-            // Lógica de Doble Clic Corregida
-            modalImageContainer.addEventListener('dblclick', function() {
-                const cardOriginal = document.querySelector(`.pin-card[data-id="${currentId}"]`);
-                if (cardOriginal.getAttribute('data-guardada') !== 'true') {
-                    likeBtn.click();
-                }
+        cards.forEach(card => {
+            card.addEventListener('click', function() {
+                currentId = this.getAttribute('data-id');
+                const autor = this.getAttribute('data-autor');
+                const guardado = this.getAttribute('data-guardada') === 'true';
                 
-                // Reiniciar y disparar animación
                 giantHeart.classList.remove('animate-heart');
-                void giantHeart.offsetWidth; // Reflow para reiniciar animación CSS
-                giantHeart.classList.add('animate-heart');
                 
-                // Limpiar después de la animación
-                setTimeout(() => {
-                    giantHeart.classList.remove('animate-heart');
-                }, 800);
-            });
+                document.getElementById('modalImg').src = this.getAttribute('data-enlace');
+                document.getElementById('modalTitulo').innerText = this.getAttribute('data-titulo');
+                document.getElementById('modalAutor').innerText = '@' + autor;
+                
+                // CAMBIO 3: Actualizar el link del perfil dinámicamente en el modal
+                document.getElementById('linkPerfilModal').href = '/usuario/perfil/' + autor;
 
-            likeBtn.addEventListener('click', function() {
-                if (!currentId) return;
-                fetch('/like/' + currentId, { 
-                    method: 'POST',
-                    headers: { [csrfHeader]: csrfToken }
-                })
-                .then(response => response.json())
-                .then(nuevoEstado => {
-                    actualizarEstadoBoton(nuevoEstado);
-                    const cardOriginal = document.querySelector(`.pin-card[data-id="${currentId}"]`);
-                    cardOriginal.setAttribute('data-guardada', nuevoEstado);
-                    if(nuevoEstado) saveToast.show();
-                })
-                .catch(err => console.error("Error:", err));
+                actualizarEstadoBoton(guardado);
+                detailModal.show();
             });
         });
-    </script>
+
+        modalImageContainer.addEventListener('dblclick', function() {
+            const cardOriginal = document.querySelector(`.pin-card[data-id="${currentId}"]`);
+            if (cardOriginal.getAttribute('data-guardada') !== 'true') {
+                likeBtn.click();
+            }
+            giantHeart.classList.remove('animate-heart');
+            void giantHeart.offsetWidth; 
+            giantHeart.classList.add('animate-heart');
+            setTimeout(() => { giantHeart.classList.remove('animate-heart'); }, 800);
+        });
+
+        likeBtn.addEventListener('click', function() {
+            if (!currentId) return;
+            fetch('/like/' + currentId, { 
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken }
+            })
+            .then(response => response.json())
+            .then(nuevoEstado => {
+                actualizarEstadoBoton(nuevoEstado);
+                const cardOriginal = document.querySelector(`.pin-card[data-id="${currentId}"]`);
+                cardOriginal.setAttribute('data-guardada', nuevoEstado);
+                if(nuevoEstado) saveToast.show();
+            })
+            .catch(err => console.error("Error:", err));
+        });
+    });
+</script>
 </body>
 </html>
