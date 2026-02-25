@@ -1,3 +1,2 @@
--Cifrado URL (compli)
 -borrar publicaciones al borrar el usuario
 -poder imagenes desde el home al pulsarle

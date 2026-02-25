@@ -76,13 +76,13 @@ public class GestionControler {
 		if (user == null) {
 			return "redirect:/";
 		}
-		
-		Imagen selectedImg =  imagenService.buscarPorId(id);
-		
-		if(!user.equals(selectedImg.getUsuario())) {
+
+		Imagen selectedImg = imagenService.buscarPorId(id);
+
+		if (!user.equals(selectedImg.getUsuario())) {
 			return "redirect:/gestion/mis-pines?erroru=true";
 		}
-		
+
 		imagenService.borrar(id);
 		return "redirect:/gestion/mis-pines";
 	}

@@ -20,12 +20,12 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
-	
+
 	@Autowired
 	EmailInterface emailServ;
-	
+
 	@Autowired
-    private BCryptPasswordEncoder encoder;
+	private BCryptPasswordEncoder encoder;
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
@@ -38,8 +38,8 @@ public class LoginController {
 	@PostMapping("/login")
 	public String login(@RequestParam String nombre, @RequestParam String contrasenya, HttpSession session) {
 		Optional<Usuario> usuario = usuarioRepository.findById(nombre);
-		
-		if (usuario.isPresent() &&encoder.matches(contrasenya, usuario.get().getContrasenya())) {
+
+		if (usuario.isPresent() && encoder.matches(contrasenya, usuario.get().getContrasenya())) {
 			session.setAttribute("usuarioLogueado", usuario.get());
 			return "redirect:/home";
 		}
@@ -51,45 +51,44 @@ public class LoginController {
 		session.invalidate();
 		return "redirect:/";
 	}
+
 	@PostMapping("/recuperar-password")
 	public String sendEmail(@RequestParam("usuario") String nombre) {
-	    try {
-	        Optional<Usuario> usuarioOpt = usuarioRepository.findById(nombre);
-	        
-	        if (usuarioOpt.isPresent()) {
-	            Usuario usuario = usuarioOpt.get();
-	            
-	            // 1. Obtenemos el hash de BCrypt que ya está en la base de datos
-	            String hashActual = usuario.getContrasenya();
-	          //  String usuarioHasheada = encoder.encode(usuario.getNombre());
-	            // 2. Lo convertimos a Hexadecimal para que la URL sea segura (sin $, / ni .)
-	            String tokenHex = org.springframework.util.DigestUtils.md5DigestAsHex(hashActual.getBytes(StandardCharsets.UTF_8));
-	            String tokenHexu = org.springframework.util.DigestUtils.md5DigestAsHex(usuario.getNombre().getBytes(StandardCharsets.UTF_8));
-	            // 3. Construimos la nueva URL con el token y el nombre
-	            String urlConToken = "https://unopportunely-cindery-merna.ngrok-free.dev/usuario/cambiar-password"
-	                    + "?token=" + tokenHex 
-	                    + "&u=" + tokenHexu;
+		try {
+			Optional<Usuario> usuarioOpt = usuarioRepository.findById(nombre);
 
-	            // 4. Configuramos y enviamos el email
-	            Email emai = new Email(
-	                usuario.getCorreo(),
-	                "Recuperación de contraseña",
-	                "Has solicitado restablecer tu contraseña. Haz clic en el botón para continuar. "
-	                + "Este enlace solo funcionará una vez.",
-	                urlConToken
-	            );
-	            
-	            emailServ.sendMail(emai);
-	            return "redirect:/?recuperado=true";
-	            
-	        } else {
-	            return "redirect:/?noexiste=true";
-	        }
-	        
-	    } catch (MessagingException e) {
-	        e.printStackTrace();
-	        return "redirect:/?error=true";
-	    }
+			if (usuarioOpt.isPresent()) {
+				Usuario usuario = usuarioOpt.get();
+
+				// 1. Obtenemos el hash de BCrypt que ya está en la base de datos
+				String hashActual = usuario.getContrasenya();
+				// String usuarioHasheada = encoder.encode(usuario.getNombre());
+				// 2. Lo convertimos a Hexadecimal para que la URL sea segura (sin $, / ni .)
+				String tokenHex = org.springframework.util.DigestUtils
+						.md5DigestAsHex(hashActual.getBytes(StandardCharsets.UTF_8));
+				String tokenHexu = org.springframework.util.DigestUtils
+						.md5DigestAsHex(usuario.getNombre().getBytes(StandardCharsets.UTF_8));
+				// 3. Construimos la nueva URL con el token y el nombre
+				String urlConToken = "https://unopportunely-cindery-merna.ngrok-free.dev/usuario/cambiar-password"
+						+ "?token=" + tokenHex + "&u=" + tokenHexu;
+
+				// 4. Configuramos y enviamos el email
+				Email emai = new Email(usuario.getCorreo(), "Recuperación de contraseña",
+						"Has solicitado restablecer tu contraseña. Haz clic en el botón para continuar. "
+								+ "Este enlace solo funcionará una vez.",
+						urlConToken);
+
+				emailServ.sendMail(emai);
+				return "redirect:/?recuperado=true";
+
+			} else {
+				return "redirect:/?noexiste=true";
+			}
+
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			return "redirect:/?error=true";
+		}
 	}
-	
+
 }

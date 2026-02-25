@@ -26,12 +26,14 @@
 		    <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
 		</div>
 		
-	<div class="container-fluid d-flex justify-content-end">
-	    <button class="btn btn-light rounded-pill">
-	        <i class="bi bi-person-circle"></i>
-	        <span th:text="${session.usuarioLogueado.nombre}"></span>
-	    </button>
-	</div>
+<div class="container-fluid d-flex justify-content-end">
+    <a th:href="@{/usuario/mi-perfil}" class="text-decoration-none">
+        <button class="btn btn-light rounded-pill border shadow-sm">
+            <i class="bi bi-person-circle"></i>
+            <span th:text="${session.usuarioLogueado.nombre}"></span>
+        </button>
+    </a>
+</div>
 
 
     </nav>

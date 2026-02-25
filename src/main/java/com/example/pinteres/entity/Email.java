@@ -12,11 +12,11 @@ import lombok.Setter;
 public class Email {
 
 	private String destinatario;
-	
+
 	private String asunto;
-	
+
 	private String mensaje;
-	
+
 	private String urlBtn;
-	
+
 }

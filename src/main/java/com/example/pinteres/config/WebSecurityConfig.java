@@ -11,11 +11,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
 	@Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http
 
-            .formLogin(form -> form.disable()); // Desactiva el formulario por defecto de Spring
-            
-        return http.build();
-    }
+				.formLogin(form -> form.disable()); // Desactiva el formulario por defecto de Spring
+
+		return http.build();
+	}
 }
