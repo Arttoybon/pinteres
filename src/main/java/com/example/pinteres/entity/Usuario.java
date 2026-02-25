@@ -7,6 +7,9 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,4 +34,12 @@ public class Usuario {
 
 	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Imagen> galeria = new ArrayList<>();
+	
+	@ManyToMany
+	@JoinTable(
+	    name = "usuario_favoritos",
+	    joinColumns = @JoinColumn(name = "usuario_nombre"),
+	    inverseJoinColumns = @JoinColumn(name = "imagen_id")
+	)
+	private List<Imagen> guardados = new ArrayList<>();
 }

@@ -52,5 +52,26 @@ public class ImagenService {
 	public void borrar(Long id) {
 		imgRep.deleteById(id);
 	}
+	
+	// Añade esto a ImagenService.java
+	public void toggleLike(Long imagenId, String nombreUsuario) {
+	    Usuario usuario = usuResp.findById(nombreUsuario)
+	        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+	    Imagen imagen = imgRep.findById(imagenId)
+	        .orElseThrow(() -> new RuntimeException("Imagen no encontrada"));
+
+	    if (usuario.getGuardados().contains(imagen)) {
+	        usuario.getGuardados().remove(imagen);
+	    } else {
+	        usuario.getGuardados().add(imagen);
+	    }
+	    usuResp.save(usuario);
+	}
+
+	// Para listar solo las guardadas
+	public List<Imagen> listarGuardadas(String nombreUsuario) {
+	    Usuario usuario = usuResp.findById(nombreUsuario).get();
+	    return usuario.getGuardados();
+	}
 
 }

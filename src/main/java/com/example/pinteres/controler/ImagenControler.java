@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.pinteres.entity.Imagen;
 import com.example.pinteres.entity.Usuario;
@@ -71,4 +72,25 @@ public class ImagenControler {
 		return "mis-pines";
 	}
 
+	// Añade estos métodos a ImagenControler.java
+
+	@PostMapping("/like/{id}")
+	@ResponseBody // Para que responda sin recargar la página
+	public String toggleLike(@PathVariable Long id, HttpSession session) {
+	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
+	    if (user == null) return "error";
+	    
+	    imagenService.toggleLike(id, user.getNombre());
+	    return "ok";
+	}
+
+	@GetMapping("/mis-guardados")
+	public String vistaGuardados(Model model, HttpSession session) {
+	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
+	    if (user == null) return "redirect:/";
+
+	    model.addAttribute("imagenes", imagenService.listarGuardadas(user.getNombre()));
+	    model.addAttribute("tituloPagina", "Mis Guardados");
+	    return "home"; // Reutilizamos home.html ya que la galería es igual
+	}
 }
