@@ -56,11 +56,6 @@ public class ImagenControler {
 		return "redirect:/home";
 	}
 
-	@GetMapping("/borrar/{id}")
-	public String eliminar(@PathVariable Long id) {
-		imagenService.borrar(id);
-		return "redirect:/";
-	}
 
 	@GetMapping("/mis-pines")
 	public String vistaGestion(Model model, HttpSession session) {
