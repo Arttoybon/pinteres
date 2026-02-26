@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <script>
-        (function() {
+        (function () {
             const tema = localStorage.getItem('theme') || 'light';
             if (tema === 'dark') {
                 document.documentElement.setAttribute('data-bs-theme', 'dark');
@@ -10,212 +11,348 @@
         })();
     </script>
     <meta charset="UTF-8">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pint - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f8f9fa; transition: background-color 0.3s, color 0.3s; }
-        .pin-card { border-radius: 16px; overflow: hidden; transition: transform 0.2s; border: none; }
-        .pin-card:hover { transform: scale(1.02); cursor: pointer; }
-        .pin-img { border-radius: 16px; width: 100%; height: auto; object-fit: cover; }
-        
-        .modal-instagram .modal-dialog { max-width: 850px; }
-        .modal-instagram .modal-content { border-radius: 32px; overflow: hidden; border: none; }
-        .modal-container { display: flex; min-height: 500px; }
-        .modal-image-side { flex: 1.2; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
-        .modal-image-side img { width: 100%; height: 100%; object-fit: cover; }
-        .modal-info-side { flex: 1; background: white; padding: 32px; display: flex; flex-direction: column; }
-        .user-avatar { width: 48px; height: 48px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.5rem; }
+        body {
+            background-color: #f8f9fa;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-        @media (min-width: 768px) { body { padding-left: 80px; } }
+        .pin-card {
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            border: none;
+        }
 
-        [data-bs-theme="dark"] body { background-color: #121212 !important; color: #f8f9fa; }
-        [data-bs-theme="dark"] .modal-content, [data-bs-theme="dark"] .modal-info-side, [data-bs-theme="dark"] .pin-card { background-color: #1e1e1e; color: white; }
-        [data-bs-theme="dark"] .bg-light { background-color: #2b2b2b !important; }
-        [data-bs-theme="dark"] .text-dark { color: white !important; }
-        [data-bs-theme="dark"] .modal-image-side { background-color: #000 !important; }
+        .pin-card:hover {
+            transform: scale(1.02);
+            cursor: pointer;
+        }
+
+        .pin-img {
+            border-radius: 16px;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .modal-instagram .modal-dialog {
+            max-width: 850px;
+        }
+
+        .modal-instagram .modal-content {
+            border-radius: 32px;
+            overflow: hidden;
+            border: none;
+        }
+
+        .modal-container {
+            display: flex;
+            min-height: 500px;
+        }
+
+        .modal-image-side {
+            flex: 1.2;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .modal-image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-info-side {
+            flex: 1;
+            background: white;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            background: #333;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding-left: 80px;
+            }
+        }
+
+        [data-bs-theme="dark"] body {
+            background-color: #121212 !important;
+            color: #f8f9fa;
+        }
+
+        [data-bs-theme="dark"] .modal-content,
+        [data-bs-theme="dark"] .modal-info-side,
+        [data-bs-theme="dark"] .pin-card {
+            background-color: #1e1e1e;
+            color: white;
+        }
+
+        [data-bs-theme="dark"] .bg-light {
+            background-color: #2b2b2b !important;
+        }
+
+        [data-bs-theme="dark"] .text-dark {
+            color: white !important;
+        }
+
+        [data-bs-theme="dark"] .modal-image-side {
+            background-color: #000 !important;
+        }
 
         /* --- ANIMACIÓN DEL CORAZÓN --- */
-        .floating-heart { 
-            position: absolute; 
-            color: white; 
-            font-size: 6rem; 
-            opacity: 0; 
-            pointer-events: none; 
-            z-index: 10; 
-            display: none; 
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.3));
+        .floating-heart {
+            position: absolute;
+            color: white;
+            font-size: 6rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
         }
-        @keyframes heartIn {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.4); opacity: 0.9; }
-            100% { transform: scale(1.2); opacity: 0; }
-        }
-        .animate-heart { display: block !important; animation: heartIn 0.7s ease-out forwards; }
 
-        @keyframes heartPulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        .pulse-animation { animation: heartPulse 0.3s ease-out; }
-        #likeBtn { width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; margin-bottom: -10px; margin-right: -10px; }
-        
-        @media (max-width: 768px) { .modal-container { flex-direction: column; } .modal-image-side { height: 300px; } }
+        @keyframes heartIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.4);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .animate-heart {
+            display: block !important;
+            animation: heartIn 0.7s ease-out forwards;
+        }
+
+        @keyframes heartPulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse-animation {
+            animation: heartPulse 0.3s ease-out;
+        }
+
+        #likeBtn {
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            margin-bottom: -10px;
+            margin-right: -10px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-container {
+                flex-direction: column;
+            }
+
+            .modal-image-side {
+                height: 300px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<div th:replace="~{navbar :: menuPrincipal}"></div>
+    <div th:replace="~{navbar :: menuPrincipal}"></div>
 
-<div class="container-fluid px-4 py-4">
-    <h2 class="fw-bold mb-4" th:text="${tituloPagina}"></h2>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-        <div class="col" th:each="img : ${imagenes}">
-            <div class="card pin-card shadow-sm btn-open-modal" 
-                 th:data-id="${img.id}"
-                 th:data-enlace="${img.enlace}" 
-                 th:data-titulo="${img.titulo}" 
-                 th:data-autor="${img.usuario.nombre}"
-                 th:data-guardada="${imagenService.estaGuardado(img.id, session.usuarioLogueado.nombre)}">
-                <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
-                <div class="p-2">
-                    <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
-                    <p class="text-muted mb-0" style="font-size: 0.75rem;">
-                        <a th:href="@{/usuario/perfil/{nombre}(nombre=${img.usuario.nombre})}" class="text-decoration-none text-muted">
-                            <span class="fw-bold" th:text="'@' + ${img.usuario.nombre}"></span>
-                        </a>
-                    </p>
+    <div class="container-fluid px-4 py-4">
+        <h2 class="fw-bold mb-4" th:text="${tituloPagina}"></h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            <div class="col" th:each="img : ${imagenes}">
+                <div class="card pin-card shadow-sm btn-open-modal" th:data-id="${img.id}"
+                    th:data-enlace="${img.enlace}" th:data-titulo="${img.titulo}" th:data-autor="${img.usuario.nombre}"
+                    th:data-guardada="${imagenService.estaGuardado(img.id, session.usuarioLogueado.nombre)}">
+                    <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
+                    <div class="p-2">
+                        <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
+                        <p class="text-muted mb-0" style="font-size: 0.75rem;">
+                            <a th:href="@{/usuario/perfil/{nombre}(nombre=${img.usuario.nombre})}"
+                                class="text-decoration-none text-muted">
+                                <span class="fw-bold" th:text="'@' + ${img.usuario.nombre}"></span>
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade modal-instagram" id="pinDetailModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-container">
-                <div class="modal-image-side" id="modalImageContainer">
-                    <i class="bi bi-heart-fill floating-heart" id="giantHeart"></i>
-                    <img id="modalImg" src="" alt="">
-                </div>
-                <div class="modal-info-side">
-                    <div class="d-flex justify-content-end mb-2">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal fade modal-instagram" id="pinDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-container">
+                    <div class="modal-image-side" id="modalImageContainer">
+                        <i class="bi bi-heart-fill floating-heart" id="giantHeart"></i>
+                        <img id="modalImg" src="" alt="">
                     </div>
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="user-avatar"><i class="bi bi-person-circle"></i></div>
-                        <div>
-                            <a id="modalAutorLink" href="#" class="text-decoration-none text-dark">
-                                <span class="fw-bold d-block" id="modalAutor">@autor</span>
-                            </a>
+                    <div class="modal-info-side">
+                        <div class="d-flex justify-content-end mb-2">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="user-avatar"><i class="bi bi-person-circle"></i></div>
+                            <div>
+                                <a id="modalAutorLink" href="#" class="text-decoration-none text-dark">
+                                    <span class="fw-bold d-block" id="modalAutor">@autor</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="bg-light p-3 rounded-4 mb-4">
+                            <h3 id="modalTitulo" class="fw-bold h5 m-0">Título</h3>
+                        </div>
+                        <div class="mt-auto d-flex justify-content-end">
+                            <button id="likeBtn" class="btn rounded-circle shadow-sm border p-0">
+                                <i id="likeIcon" class="bi bi-heart fs-2"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="bg-light p-3 rounded-4 mb-4">
-                        <h3 id="modalTitulo" class="fw-bold h5 m-0">Título</h3>
-                    </div>
-                    <div class="mt-auto d-flex justify-content-end">
-                        <button id="likeBtn" class="btn rounded-circle shadow-sm border p-0">
-                            <i id="likeIcon" class="bi bi-heart fs-2"></i>
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2050;">
-    <div id="saveToast" class="toast align-items-center text-white bg-dark border-0 rounded-4" role="alert">
-        <div class="d-flex">
-            <div class="toast-body"><i class="bi bi-check-circle-fill text-success me-2"></i> ¡Guardado en favoritos!</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-toast="dismiss"></button>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2050;">
+        <div id="saveToast" class="toast align-items-center text-white bg-dark border-0 rounded-4" role="alert">
+            <div class="d-flex">
+                <div class="toast-body"><i class="bi bi-check-circle-fill text-success me-2"></i> ¡Guardado en
+                    favoritos!</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-toast="dismiss"></button>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const detailModal = new bootstrap.Modal(document.getElementById('pinDetailModal'));
-        const saveToast = new bootstrap.Toast(document.getElementById('saveToast'));
-        const cards = document.querySelectorAll('.btn-open-modal');
-        const likeBtn = document.getElementById('likeBtn');
-        const likeIcon = document.getElementById('likeIcon');
-        const modalImageContainer = document.getElementById('modalImageContainer');
-        const giantHeart = document.getElementById('giantHeart');
-        
-        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-        
-        let currentId = null;
-        let lastTap = 0; // Para móvil
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const detailModal = new bootstrap.Modal(document.getElementById('pinDetailModal'));
+            const saveToast = new bootstrap.Toast(document.getElementById('saveToast'));
+            const cards = document.querySelectorAll('.btn-open-modal');
+            const likeBtn = document.getElementById('likeBtn');
+            const likeIcon = document.getElementById('likeIcon');
+            const modalImageContainer = document.getElementById('modalImageContainer');
+            const giantHeart = document.getElementById('giantHeart');
 
-        function actualizarEstadoBoton(estaGuardado) {
-            if (estaGuardado) {
-                likeBtn.className = 'btn btn-danger text-white rounded-circle shadow-sm p-0 pulse-animation';
-                likeIcon.className = 'bi bi-heart-fill fs-2';
-            } else {
-                likeBtn.className = 'btn btn-light text-danger rounded-circle shadow-sm border p-0';
-                likeIcon.className = 'bi bi-heart fs-2';
-            }
-        }
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        // FUNCIÓN PARA ENVIAR EL LIKE
-        function toggleLike() {
-            if (!currentId) return;
-            fetch('/like/' + currentId, { 
-                method: 'POST',
-                headers: { [csrfHeader]: csrfToken }
-            })
-            .then(res => res.json())
-            .then(nuevoEstado => {
-                actualizarEstadoBoton(nuevoEstado);
-                document.querySelector(`.pin-card[data-id="${currentId}"]`).setAttribute('data-guardada', nuevoEstado);
-                
-                if(nuevoEstado) {
-                    saveToast.show();
-                    // Animación corazón gigante
-                    giantHeart.classList.add('animate-heart');
-                    setTimeout(() => giantHeart.classList.remove('animate-heart'), 700);
+            let currentId = null;
+            let lastTap = 0; // Para móvil
+
+            function actualizarEstadoBoton(estaGuardado) {
+                if (estaGuardado) {
+                    likeBtn.className = 'btn btn-danger text-white rounded-circle shadow-sm p-0 pulse-animation';
+                    likeIcon.className = 'bi bi-heart-fill fs-2';
+                } else {
+                    likeBtn.className = 'btn btn-light text-danger rounded-circle shadow-sm border p-0';
+                    likeIcon.className = 'bi bi-heart fs-2';
                 }
-            });
-        }
-
-        cards.forEach(card => {
-            card.addEventListener('click', function(e) {
-                if (e.target.closest('a')) return;
-
-                currentId = this.getAttribute('data-id');
-                const nombreAutor = this.getAttribute('data-autor');
-
-                document.getElementById('modalImg').src = this.getAttribute('data-enlace');
-                document.getElementById('modalTitulo').innerText = this.getAttribute('data-titulo');
-                document.getElementById('modalAutor').innerText = '@' + nombreAutor;
-                document.getElementById('modalAutorLink').href = '/usuario/perfil/' + nombreAutor;
-                
-                actualizarEstadoBoton(this.getAttribute('data-guardada') === 'true');
-                detailModal.show();
-            });
-        });
-
-        // Evento botón click
-        likeBtn.addEventListener('click', toggleLike);
-
-        // Evento Doble Click (Escritorio)
-        modalImageContainer.addEventListener('dblclick', toggleLike);
-
-        // Evento Doble Tap (Móvil)
-        modalImageContainer.addEventListener('touchend', function (e) {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            if (tapLength < 300 && tapLength > 0) {
-                toggleLike();
-                e.preventDefault();
             }
-            lastTap = currentTime;
+
+            // FUNCIÓN PARA ENVIAR EL LIKE
+            function toggleLike() {
+                if (!currentId) return;
+                fetch('/like/' + currentId, {
+                    method: 'POST',
+                    headers: { [csrfHeader]: csrfToken }
+                })
+                    .then(res => res.json())
+                    .then(nuevoEstado => {
+                        actualizarEstadoBoton(nuevoEstado);
+                        document.querySelector(`.pin-card[data-id="${currentId}"]`).setAttribute('data-guardada', nuevoEstado);
+
+                        if (nuevoEstado) {
+                            saveToast.show();
+                            // Animación corazón gigante
+                            giantHeart.classList.add('animate-heart');
+                            setTimeout(() => giantHeart.classList.remove('animate-heart'), 700);
+                        }
+                    });
+            }
+
+            cards.forEach(card => {
+                card.addEventListener('click', function (e) {
+                    if (e.target.closest('a')) return;
+
+                    currentId = this.getAttribute('data-id');
+                    const nombreAutor = this.getAttribute('data-autor');
+
+                    document.getElementById('modalImg').src = this.getAttribute('data-enlace');
+                    document.getElementById('modalTitulo').innerText = this.getAttribute('data-titulo');
+                    document.getElementById('modalAutor').innerText = '@' + nombreAutor;
+                    document.getElementById('modalAutorLink').href = '/usuario/perfil/' + nombreAutor;
+
+                    actualizarEstadoBoton(this.getAttribute('data-guardada') === 'true');
+                    detailModal.show();
+                });
+            });
+
+            // Evento botón click
+            likeBtn.addEventListener('click', toggleLike);
+
+            // Evento Doble Click (Escritorio)
+            modalImageContainer.addEventListener('dblclick', toggleLike);
+
+            // Evento Doble Tap (Móvil)
+            modalImageContainer.addEventListener('touchend', function (e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    toggleLike();
+                    e.preventDefault();
+                }
+                lastTap = currentTime;
+            });
         });
-    });
-</script>
+    </script>
 </body>
+
 </html>
