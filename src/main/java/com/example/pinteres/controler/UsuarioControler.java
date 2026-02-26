@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.pinteres.entity.Imagen;
 import com.example.pinteres.entity.Usuario;
+import com.example.pinteres.service.ImagenService;
 import com.example.pinteres.service.UsuarioService;
 
 import jakarta.servlet.http.HttpSession;
@@ -22,6 +24,9 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/usuario")
 public class UsuarioControler {
 
+	@Autowired
+	private ImagenService imagenService;
+	
 	@Autowired
 	private UsuarioService usuarioService;
 
@@ -101,27 +106,6 @@ public class UsuarioControler {
 		return "redirect:/?actualizado=true";
 	}
 
-	@GetMapping("/mi-perfil")
-	public String mostrarPerfil(HttpSession session, Model model) {
-	    // 1. Obtenemos el usuario básico de la sesión
-	    Usuario logeado = (Usuario) session.getAttribute("usuarioLogueado");
-
-	    if (logeado == null) {
-	        return "redirect:/?error=sesion_expirada";
-	    }
-
-	    // 2. IMPORTANTE: Buscamos al usuario de nuevo en la DB para que 
-	    // su 'galeria' esté disponible y no de error de Hibernate.
-	    Usuario usuarioCompleto = usuarioService.buscarPorNombre(logeado.getNombre());
-
-	    // 3. Pasamos los datos necesarios al HTML
-	    model.addAttribute("usuario", usuarioCompleto);
-	    model.addAttribute("esMiPerfil", true);
-	    // Pasamos la lista de sus publicaciones (sus "pines")
-	    model.addAttribute("publicaciones", usuarioCompleto.getGaleria()); 
-	    
-	    return "perfil-usuario";
-	}
 
 	@PostMapping("/actualizar-perfil")
 	public String procesarActualizacion(@RequestParam String nuevoNombre,
@@ -159,25 +143,50 @@ public class UsuarioControler {
 	    return "redirect:/?cuentaEliminada=true";
 	}
 	
-	@GetMapping("/perfil/{nombre}")
-	public String verPerfilPublico(@PathVariable String nombre, HttpSession session, Model model) {
-	    // 1. Buscamos el usuario que se quiere visitar
-	    Usuario usuarioAVisitar = usuarioService.buscarPorNombre(nombre);
-	    
-	    if (usuarioAVisitar == null) {
-	        return "redirect:/home?error=usuario_no_encontrado";
-	    }
+	@GetMapping("/mi-perfil")
+    public String miPerfil(Model model, HttpSession session) {
+        // 1. Obtener el usuario de la sesión
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        
+        if (usuarioLogueado == null) {
+            return "redirect:/login";
+        }
 
-	    // 2. Obtenemos el usuario logueado de la sesión (para comparar)
-	    Usuario logeado = (Usuario) session.getAttribute("usuarioLogueado");
+        // 2. Usar el nombre exacto del método de tu ImagenService
+        // Tu servicio recibe el nombre (String), no el objeto Usuario completo
+        List<Imagen> misPublicaciones = imagenService.imagenesDeUsuario(usuarioLogueado.getNombre());
 
-	    // 3. Pasamos ambos al modelo
-	    model.addAttribute("usuario", usuarioAVisitar);
-	    model.addAttribute("esMiPerfil", logeado != null && logeado.getNombre().equals(usuarioAVisitar.getNombre()));
-	    
-	    // 4. Pasamos su galería de imágenes
-	    model.addAttribute("publicaciones", usuarioAVisitar.getGaleria());
+        // 3. Añadir todo al modelo usando la variable 'model'
+        model.addAttribute("usuario", usuarioLogueado);
+        model.addAttribute("publicaciones", misPublicaciones);
+        model.addAttribute("esMiPerfil", true);
+        
+        // ESTO ARREGLA EL ERROR "null context object" en perfil-usuario.html
+        model.addAttribute("imagenService", imagenService); 
 
-	    return "perfil-usuario";
-	}
+        return "perfil-usuario";
+    }
+
+    @GetMapping("/perfil/{nombre}")
+    public String perfilPublico(@PathVariable String nombre, Model model, HttpSession session) {
+        // 1. Buscar al usuario cuyo perfil queremos ver
+        // (Asumo que tienes un método buscarPorNombre en tu UsuarioService)
+        Usuario usuarioVer = usuarioService.buscarPorNombre(nombre); 
+        
+        if (usuarioVer == null) {
+            return "redirect:/home";
+        }
+
+        // 2. Obtener sus fotos
+        List<Imagen> publicaciones = imagenService.imagenesDeUsuario(nombre);
+
+        // 3. Pasar datos al modelo
+        model.addAttribute("usuario", usuarioVer);
+        model.addAttribute("publicaciones", publicaciones);
+        model.addAttribute("esMiPerfil", false);
+        model.addAttribute("imagenService", imagenService); // Siempre pasarlo si el HTML lo usa
+
+        return "perfil-usuario";
+    }
+
 }

@@ -2,16 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
     <title th:text="'Perfil de ' + ${usuario.nombre}">Perfil</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        .pin-card { border-radius: 16px; overflow: hidden; border: none; transition: transform 0.2s; }
+        .pin-card { border-radius: 16px; overflow: hidden; border: none; transition: transform 0.2s; cursor: zoom-in; }
         .pin-card:hover { transform: scale(1.02); }
-        .pin-img { border-radius: 16px; width: 100%; object-fit: cover; }
+        .pin-img { border-radius: 16px; width: 100%; height: auto; object-fit: cover; }
         .avatar-placeholder { 
             width: 120px; height: 120px; font-size: 4rem; 
             background-color: #efefef; color: #5f5f5f; 
+        }
+        .modal-pin-content { border-radius: 32px; border: none; overflow: hidden; }
+        .modal-pin-img { width: 100%; height: 100%; object-fit: contain; background-color: #f8f9fa; max-height: 85vh; }
+        
+        /* Estilos de botones del Home */
+        #likeBtnModal { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .pulse-animation { animation: heartPulse 0.3s ease-out; }
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -26,7 +40,7 @@
         <p class="text-muted" th:text="'@' + ${usuario.nombre}"></p>
 
         <div th:if="${esMiPerfil}" class="mx-auto" style="max-width: 500px;">
-            <div class="card border-0 bg-light rounded-4 p-4 mb-5">
+            <div class="card border-0 bg-light rounded-4 p-4 mb-5 shadow-sm">
                 <form th:action="@{/usuario/actualizar-perfil}" th:object="${usuario}" method="post">
                     <div class="mb-3 text-start">
                         <label class="form-label small fw-bold">Nombre de Usuario</label>
@@ -54,10 +68,11 @@
         
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
             <div th:each="img : ${publicaciones}" class="col">
-                <div class="card pin-card shadow-sm">
+                <div class="card pin-card shadow-sm" 
+                     th:onclick="abrirModal([[${img.id}]], [[${img.enlace}]], [[${img.titulo}]], [[${usuario.nombre}]], [[${imagenService.estaGuardado(img.id, session.usuarioLogueado.nombre)}]])">
                     <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
-                    <div class="p-2">
-                        <p class="small fw-bold m-0 text-start" th:text="${img.titulo}"></p>
+                    <div class="p-2 text-start">
+                        <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
                     </div>
                 </div>
             </div>
@@ -67,17 +82,97 @@
             <i class="bi bi-camera fs-1"></i>
             <p class="mt-2">Este usuario aún no tiene publicaciones.</p>
         </div>
+    </div>
 
-        <div th:if="${esMiPerfil}" class="mt-5 pt-5 mb-5 border-top">
-            <p class="text-muted small">Zona de peligro</p>
-            <form th:action="@{/usuario/eliminar-cuenta}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres borrar tu cuenta?');">
-                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-4">
-                    Eliminar cuenta definitivamente
-                </button>
-            </form>
+    <div class="modal fade" id="modalPin" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content modal-pin-content">
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <div class="col-12 col-lg-7">
+                            <img id="modalImg" src="" class="modal-pin-img">
+                        </div>
+                        <div class="col-12 col-lg-5 p-4 d-flex flex-column">
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 45px; height: 45px;">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span class="fw-bold fs-5" id="modalUsuario">@usuario</span>
+                                </div>
+                                
+                                <h2 class="fw-bold mb-3" id="modalTitulo">Título</h2>
+                                <div class="p-3 bg-light rounded-4">
+                                    <p class="m-0 text-muted small">Este pin pertenece a la colección de este usuario.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-4 d-flex justify-content-end align-items-center">
+                                <button id="likeBtnModal" class="btn rounded-circle shadow-sm border p-0" onclick="darLike()">
+                                    <i id="iconoCorazon" class="bi bi-heart fs-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script th:inline="javascript">
+        let idImagenActual = null;
+        
+        // Capturamos el CSRF del Header (Igual que en tu Home)
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        function abrirModal(id, enlace, titulo, nombreUsuario, estaGuardado) {
+            idImagenActual = id;
+            document.getElementById('modalImg').src = enlace;
+            document.getElementById('modalTitulo').innerText = titulo;
+            document.getElementById('modalUsuario').innerText = '@' + nombreUsuario;
+            
+            actualizarEstadoCorazon(estaGuardado);
+            
+            var modal = new bootstrap.Modal(document.getElementById('modalPin'));
+            modal.show();
+        }
+
+        function actualizarEstadoCorazon(estaGuardado) {
+            const btn = document.getElementById('likeBtnModal');
+            const icon = document.getElementById('iconoCorazon');
+            
+            if (estaGuardado) {
+                btn.classList.remove('btn-light', 'text-danger');
+                btn.classList.add('btn-danger', 'text-white', 'pulse-animation');
+                icon.classList.replace('bi-heart', 'bi-heart-fill');
+            } else {
+                btn.classList.remove('btn-danger', 'text-white', 'pulse-animation');
+                btn.classList.add('btn-light', 'text-danger');
+                icon.classList.replace('bi-heart-fill', 'bi-heart');
+            }
+        }
+
+        function darLike() {
+            if (!idImagenActual) return;
+
+            // Enviamos el Like con el TOKEN CSRF en la cabecera
+            fetch('/like/' + idImagenActual, {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken } // ESTO ES LO QUE HACÍA QUE NO SE GUARDARA
+            })
+            .then(response => response.json())
+            .then(nuevoEstado => {
+                actualizarEstadoCorazon(nuevoEstado);
+            })
+            .catch(err => console.error("Error al dar like:", err));
+        }
+    </script>
 </body>
 </html>
