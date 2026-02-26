@@ -1,6 +1,3 @@
 - probar a mover validarRecuperacion de usarioControler a LoginControler
-- loguot movil
--rediseño formulario-cambio
 -recrear la base de datos
--pruebas unitarias
-- <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-pruebas unitaria

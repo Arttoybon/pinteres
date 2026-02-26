@@ -152,7 +152,7 @@ public class UsuarioControler {
         Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
 
         if (usuarioLogueado == null) {
-            return "redirect:/login";
+            return "redirect:/";
         }
 
         // 2. Usar el nombre exacto del método de tu ImagenService
