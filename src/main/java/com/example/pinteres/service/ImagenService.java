@@ -29,7 +29,7 @@ public class ImagenService {
 	}
 
 	public List<Imagen> listarTodas() {
-		return imgRep.findAll();
+		return imgRep.findAllByOrderByIdDesc();
 	}
 
 	public Imagen buscarPorId(Long id) {
@@ -37,7 +37,7 @@ public class ImagenService {
 	}
 
 	public List<Imagen> imagenesDeUsuario(String nombre) {
-		return imgRep.findByUsuarioNombre(nombre);
+		return imgRep.findByUsuarioNombreOrderByIdDesc(nombre);
 	}
 
 	public Imagen actualizar(Long id, Imagen datos) {

@@ -9,7 +9,9 @@ import com.example.pinteres.entity.Imagen;
 
 @Repository
 public interface ImagenRepository extends JpaRepository<Imagen, Long> {
-
+	
+	List<Imagen> findByUsuarioNombreOrderByIdDesc(String nombre);
+	List<Imagen> findAllByOrderByIdDesc();
 	List<Imagen> findByUsuarioNombre(String nombre);
 
 }

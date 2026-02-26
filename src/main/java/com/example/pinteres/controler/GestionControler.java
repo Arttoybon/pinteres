@@ -75,18 +75,19 @@ public class GestionControler {
 
 	@GetMapping("/borrar/{id}")
 	public String borrar(@PathVariable Long id, HttpSession session) {
-		Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-		if (user == null) {
-			return "redirect:/";
-		}
+	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
+	    if (user == null) {
+	        return "redirect:/";
+	    }
 
-		Imagen selectedImg = imagenService.buscarPorId(id);
+	    Imagen selectedImg = imagenService.buscarPorId(id);
 
-		if (!user.equals(selectedImg.getUsuario())) {
-			return "redirect:/gestion/mis-pines?erroru=true";
-		}
+	    // Verificamos que la imagen existe y que el nombre del dueño coincide
+	    if (selectedImg == null || !user.getNombre().equals(selectedImg.getUsuario().getNombre())) {
+	        return "redirect:/gestion/mis-pines?erroru=true";
+	    }
 
-		imagenService.borrar(id);
-		return "redirect:/gestion/mis-pines";
+	    imagenService.borrar(id);
+	    return "redirect:/gestion/mis-pines";
 	}
 }
