@@ -1,14 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Correo de prueba con HTML</title>
- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <meta charset="UTF-8">
 </head>
 <body>
-	<nav th:fragment="menuPrincipal" class="navbar navbar-expand bg-white sticky-top py-3 mb-4 shadow-sm">
-    <div class="d-none d-md-flex flex-column align-items-center bg-white vh-100 border-end py-3 shadow-sm" style="width: 80px; position: fixed; left: 0; top: 0; z-index: 1050;">
+
+<div th:fragment="menuPrincipal">
+    <style>
+        /* Configuración de Escritorio */
+        .navbar-desktop {
+            width: 80px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1050;
+        }
+
+        /* Configuración de Móvil (Barra Inferior) */
+        @media (max-width: 767.98px) {
+            .navbar-mobile-bottom {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1055; /* Aseguramos que esté por encima de todo */
+                height: 70px;
+                background-color: white;
+                display: flex !important; /* Forzamos el display flex */
+                align-items: center;
+            }
+            .navbar-top-mobile { display: none !important; }
+        }
+    </style>
+
+    <div class="d-none d-md-flex flex-column align-items-center bg-white vh-100 border-end py-3 shadow-sm navbar-desktop">
         <a th:href="@{/home}" class="mb-4 text-danger"><i class="bi bi-pinterest fs-1"></i></a>
         <a th:href="@{/home}" class="nav-link p-3 text-dark"><i class="bi bi-house-door fs-2"></i></a>
         <a th:href="@{/gestion/mis-pines}" class="nav-link p-3 text-dark"><i class="bi bi-grid fs-2"></i></a>
@@ -16,10 +41,9 @@
         <button class="btn p-3 text-dark" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
         <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
     </div>
-    
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-        <a th:href="@{/home}" class="d-md-none text-danger ms-2"><i class="bi bi-pinterest fs-2"></i></a>
-        <div class="d-flex align-items-center ms-auto">
+
+    <nav class="navbar navbar-expand bg-white sticky-top py-3 mb-4 shadow-sm navbar-top-mobile">
+        <div class="container-fluid d-flex justify-content-end align-items-center">
             <div th:if="${session.usuarioLogueado != null}">
                 <a th:href="@{/usuario/mi-perfil}" class="text-decoration-none me-2">
                     <button class="btn btn-light rounded-pill border shadow-sm d-flex align-items-center gap-2">
@@ -28,11 +52,47 @@
                     </button>
                 </a>
             </div>
-            <a th:href="@{/logout}" class="btn btn-outline-danger rounded-circle d-md-none ms-2">
-                <i class="bi bi-box-arrow-right"></i>
-            </a>
+        </div>
+    </nav>
+
+    <div class="navbar-mobile-bottom d-md-none border-top shadow-lg">
+        <div class="d-flex justify-content-around align-items-center w-100 px-2">
+            <a th:href="@{/home}" class="text-dark"><i class="bi bi-house-door fs-2"></i></a>
+            <a th:href="@{/gestion/mis-pines}" class="text-dark"><i class="bi bi-grid fs-2"></i></a>
+            <button class="btn text-dark p-0" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <i class="bi bi-plus-circle-fill fs-1 text-danger"></i>
+            </button>
+            <a th:href="@{/mis-guardados}" class="text-dark"><i class="bi bi-heart fs-2"></i></a>
+            <a th:href="@{/usuario/mi-perfil}" class="text-dark"><i class="bi bi-person-circle fs-2"></i></a>
         </div>
     </div>
-</nav>
-<body>
+
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Crear Pin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/publicar}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3 text-start">
+                            <label class="form-label small fw-bold">Título</label>
+                            <input type="text" name="titulo" class="form-control rounded-pill" placeholder="Añade un título" required>
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label small fw-bold">URL de la imagen</label>
+                            <input type="text" name="enlace" class="form-control rounded-pill" placeholder="Pega el enlace aquí" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold shadow-sm">Publicar Pin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
 </html>
