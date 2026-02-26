@@ -9,11 +9,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        /* --- ESTILOS PARA LA NAVEGACIÓN (Consistencia) --- */
-        @media (min-width: 768px) {
-            body { padding-left: 80px; } /* Espacio para barra lateral en PC */
+        /* --- CONFIGURACIÓN MODO OSCURO (NUEVO) --- */
+        [data-bs-theme="dark"] body { background-color: #121212 !important; color: #f8f9fa; }
+        [data-bs-theme="dark"] .card, [data-bs-theme="dark"] .bg-light { 
+            background-color: #1e1e1e !important; color: white; border: 1px solid #333 !important; 
         }
+        [data-bs-theme="dark"] .form-control { background-color: #2b2b2b; border-color: #444; color: white; }
+        [data-bs-theme="dark"] .avatar-placeholder { background-color: #2b2b2b; color: #888; }
+        [data-bs-theme="dark"] .pin-card { background-color: #1e1e1e; }
+        [data-bs-theme="dark"] .text-muted { color: #b0b0b0 !important; }
 
+        /* --- ESTILOS PARA LA NAVEGACIÓN (Consistencia) --- */
+        body { transition: background-color 0.3s, color 0.3s; }
+        @media (min-width: 768px) {
+            body { padding-left: 80px; } 
+        }
         @media (max-width: 767.98px) {
    			 body { padding-bottom: 90px !important; }
 		}
@@ -26,8 +36,6 @@
             width: 120px; height: 120px; font-size: 4rem; 
             background-color: #efefef; color: #5f5f5f; 
         }
-        .modal-pin-content { border-radius: 32px; border: none; overflow: hidden; }
-        .modal-pin-img { width: 100%; height: 100%; object-fit: contain; background-color: #f8f9fa; max-height: 85vh; }
         
         #likeBtnModal { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .pulse-animation { animation: heartPulse 0.3s ease-out; }
@@ -78,8 +86,7 @@
         
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-5">
             <div th:each="img : ${publicaciones}" class="col">
-                <div class="card pin-card shadow-sm" 
-                     th:onclick="abrirModal([[${img.id}]], [[${img.enlace}]], [[${img.titulo}]], [[${img.usuario.nombre}]], [[${imagenService.estaGuardado(img.id, session.usuarioLogueado.nombre)}]])">
+                <div class="card pin-card shadow-sm">
                     <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
                     <div class="p-2 text-start">
                         <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
@@ -95,8 +102,41 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:inline="javascript">
-        // ... (Tu script de JS se mantiene igual)
+    
+    <script>
+        // --- LÓGICA UNIVERSAL DE MODO OSCURO PARA PERFIL ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const htmlElement = document.documentElement;
+
+            const aplicarTema = (tema) => {
+                htmlElement.setAttribute('data-bs-theme', tema);
+                // Actualizamos iconos de todos los botones que existan (Navbar PC y Móvil)
+                const icons = document.querySelectorAll('.theme-icon');
+                icons.forEach(icon => {
+                    if(tema === 'dark') {
+                        icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                        icon.classList.add('text-warning');
+                    } else {
+                        icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+                        icon.classList.remove('text-warning');
+                    }
+                });
+            };
+
+            // 1. Cargar tema guardado
+            const temaGuardado = localStorage.getItem('theme') || 'light';
+            aplicarTema(temaGuardado);
+
+            // 2. Escuchar clics en los botones de la Navbar (usando delegación para mayor seguridad)
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.theme-toggle-btn');
+                if (btn) {
+                    const nuevoTema = htmlElement.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
+                    aplicarTema(nuevoTema);
+                    localStorage.setItem('theme', nuevoTema);
+                }
+            });
+        });
     </script>
 </body>
 </html>
