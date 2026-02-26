@@ -14,6 +14,15 @@
             left: 0;
             top: 0;
             z-index: 1050;
+            transition: background-color 0.3s;
+        }
+
+        /* Colores dinámicos para el modo oscuro manual */
+        [data-bs-theme="dark"] .navbar-desktop, 
+        [data-bs-theme="dark"] .navbar-top-mobile, 
+        [data-bs-theme="dark"] .navbar-mobile-bottom {
+            background-color: #1e1e1e !important;
+            border-color: #333 !important;
         }
 
         /* Configuración de Móvil (Barra Inferior) */
@@ -53,6 +62,10 @@
         <button class="btn p-3 text-dark" data-bs-toggle="modal" data-bs-target="#uploadModal">
             <i class="bi bi-plus-square fs-2"></i>
         </button>
+
+        <button id="theme-toggle" class="btn p-3 text-dark mt-2">
+            <i id="theme-icon" class="bi bi-moon-fill fs-2"></i>
+        </button>
         
         <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
     </div>
@@ -72,52 +85,21 @@
 
     <div class="navbar-mobile-bottom d-md-none shadow-lg">
         <div class="d-flex justify-content-around align-items-center w-100 px-2">
-            
             <a th:href="@{/home}" class="text-dark">
                 <i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i>
             </a>
-            
             <a th:href="@{/gestion/mis-pines}" class="text-dark">
                 <i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i>
             </a>
-            
             <button class="btn text-dark p-0" data-bs-toggle="modal" data-bs-target="#uploadModal">
                 <i class="bi bi-plus-circle-fill fs-1 text-danger"></i>
             </button>
-            
             <a th:href="@{/mis-guardados}" class="text-dark">
                 <i th:class="${paginaActiva == 'guardados' ? 'bi bi-heart-fill fs-2 text-danger' : 'bi bi-heart fs-2'}"></i>
             </a>
-            
             <a th:href="@{/usuario/mi-perfil}" class="text-dark">
                 <i th:class="${paginaActiva == 'perfil' ? 'bi bi-person-circle-fill fs-2' : 'bi bi-person-circle fs-2'}"></i>
             </a>
-        </div>
-    </div>
-
-    <div class="modal fade" id="uploadModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Crear Pin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form th:action="@{/publicar}" method="post">
-                    <div class="modal-body">
-                        <div class="mb-3 text-start">
-                            <label class="form-label small fw-bold">Título</label>
-                            <input type="text" name="titulo" class="form-control rounded-pill" placeholder="Añade un título" required>
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label small fw-bold">URL de la imagen</label>
-                            <input type="text" name="enlace" class="form-control rounded-pill" placeholder="Pega el enlace aquí" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold shadow-sm">Publicar Pin</button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 </div>

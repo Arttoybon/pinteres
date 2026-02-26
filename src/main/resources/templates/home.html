@@ -9,7 +9,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f8f9fa; }
+        /* Transición suave para el cambio de color */
+        body { background-color: #f8f9fa; transition: background-color 0.3s, color 0.3s; }
+        
         .pin-card { border-radius: 16px; overflow: hidden; transition: transform 0.2s; border: none; }
         .pin-card:hover { transform: scale(1.02); cursor: pointer; }
         .pin-img { border-radius: 16px; width: 100%; height: auto; object-fit: cover; }
@@ -38,6 +40,18 @@
                 padding-left: 100px !important;
             }
         }
+
+        /* --- ESTILOS EXTRA PARA MODO OSCURO (NUEVO) --- */
+        [data-bs-theme="dark"] body { background-color: #121212 !important; color: #f8f9fa; }
+        [data-bs-theme="dark"] .modal-content { background-color: #1e1e1e; color: white; }
+        [data-bs-theme="dark"] .modal-info-side { background-color: #1e1e1e; color: white; }
+        [data-bs-theme="dark"] .text-dark { color: white !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: #2b2b2b !important; }
+        [data-bs-theme="dark"] .pin-card { background-color: #1e1e1e; color: white; }
+        [data-bs-theme="dark"] .card { background-color: #1e1e1e; }
+        [data-bs-theme="dark"] .form-control { background-color: #2b2b2b; border-color: #444; color: white; }
+        [data-bs-theme="dark"] .btn-light { background-color: #333; border-color: #444; color: white; }
+        [data-bs-theme="dark"] .modal-image-side { background-color: #000 !important; }
 
         /* --- ANIMACIONES --- */
         @keyframes heartPulse {
@@ -152,11 +166,11 @@
             </div>
             <form th:action="@{/publicar}" method="post">
                 <div class="modal-body">
-                    <div class="mb-3">
+                    <div class="mb-3 text-start">
                         <label class="form-label small fw-bold">Título</label>
                         <input type="text" name="titulo" class="form-control rounded-pill" required>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 text-start">
                         <label class="form-label small fw-bold">URL de la imagen</label>
                         <input type="text" name="enlace" class="form-control rounded-pill" required>
                     </div>
@@ -184,6 +198,38 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- LÓGICA MODO OSCURO (PERSISTENCIA) ---
+        const htmlElement = document.documentElement;
+        
+        const aplicarTema = (tema) => {
+            htmlElement.setAttribute('data-bs-theme', tema);
+            const icon = document.getElementById('theme-icon');
+            if(icon) {
+                if(tema === 'dark') {
+                    icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                    icon.classList.add('text-warning');
+                } else {
+                    icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+                    icon.classList.remove('text-warning');
+                }
+            }
+        };
+
+        // Leer del localStorage al cargar
+        const temaGuardado = localStorage.getItem('theme') || 'light';
+        aplicarTema(temaGuardado);
+
+        // El evento del botón se gestiona aquí o en el navbar (si el ID es 'theme-toggle')
+        const btnToggle = document.getElementById('theme-toggle');
+        if(btnToggle) {
+            btnToggle.addEventListener('click', () => {
+                const nuevoTema = htmlElement.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
+                aplicarTema(nuevoTema);
+                localStorage.setItem('theme', nuevoTema);
+            });
+        }
+
+        // --- LÓGICA ORIGINAL DEL MODAL Y FAVORITOS ---
         const detailModal = new bootstrap.Modal(document.getElementById('pinDetailModal'));
         const saveToast = new bootstrap.Toast(document.getElementById('saveToast'));
         const cards = document.querySelectorAll('.btn-open-modal');
@@ -223,8 +269,6 @@
                 document.getElementById('modalImg').src = this.getAttribute('data-enlace');
                 document.getElementById('modalTitulo').innerText = this.getAttribute('data-titulo');
                 document.getElementById('modalAutor').innerText = '@' + autor;
-                
-                // CAMBIO 3: Actualizar el link del perfil dinámicamente en el modal
                 document.getElementById('linkPerfilModal').href = '/usuario/perfil/' + autor;
 
                 actualizarEstadoBoton(guardado);
