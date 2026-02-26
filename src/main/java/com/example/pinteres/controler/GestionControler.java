@@ -26,69 +26,81 @@ public class GestionControler {
 
 	@GetMapping("/mis-pines")
 	public String vistaGestion(@RequestParam(required = false) Long id, Model model, HttpSession session) {
-		Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-		if (user == null) {
-			return "redirect:/";
+		try {
+			Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
+			if (user == null) {
+				return "redirect:/";
+			}
+
+			List<Imagen> misImagenes = imagenService.imagenesDeUsuario(user.getNombre());
+			model.addAttribute("imagenes", misImagenes);
+
+			Imagen seleccionada = null;
+
+			if (id != null) {
+				seleccionada = imagenService.buscarPorId(id);
+			}
+
+			// Si sigue siendo null (porque no se pasó ID o el ID no existe),
+			// pero hay imágenes en la lista, agarramos la primera.
+			if (seleccionada == null && !misImagenes.isEmpty()) {
+				seleccionada = misImagenes.get(0);
+			}
+
+			model.addAttribute("imgSeleccionada", seleccionada);
+
+			model.addAttribute("paginaActiva", "pines");
+
+			return "mis-pines";
+		} catch (Exception e) {
+			return "redirect:/gestion/mis-pines?erroru=true";
 		}
-
-		List<Imagen> misImagenes = imagenService.imagenesDeUsuario(user.getNombre());
-		model.addAttribute("imagenes", misImagenes);
-
-		Imagen seleccionada = null;
-
-		if (id != null) {
-			seleccionada = imagenService.buscarPorId(id);
-		}
-
-		// Si sigue siendo null (porque no se pasó ID o el ID no existe),
-		// pero hay imágenes en la lista, agarramos la primera.
-		if (seleccionada == null && !misImagenes.isEmpty()) {
-			seleccionada = misImagenes.get(0);
-		}
-
-		model.addAttribute("imgSeleccionada", seleccionada);
-
-		model.addAttribute("paginaActiva", "pines");
-
-		return "mis-pines";
 	}
 
 	@PostMapping("/editar")
 	public String editar(@RequestParam Long id, @RequestParam String titulo, @RequestParam String enlace,
 			HttpSession session) {
+		try {
+			Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
+			Imagen img = imagenService.buscarPorId(id);
 
-		Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-		Imagen img = imagenService.buscarPorId(id);
+			// Verificamos que el usuario es el dueño de la imagen
+			if (user != null && img != null && img.getUsuario().getNombre().equals(user.getNombre())) {
+				// Actualizamos los valores del objeto
+				img.setTitulo(titulo);
+				img.setEnlace(enlace);
 
-		// Verificamos que el usuario es el dueño de la imagen
-		if (user != null && img != null && img.getUsuario().getNombre().equals(user.getNombre())) {
-			// Actualizamos los valores del objeto
-			img.setTitulo(titulo);
-			img.setEnlace(enlace);
+				// ¡IMPORTANTE! Guardar los cambios
+				imagenService.actualizar(id, img);
+			}
 
-			// ¡IMPORTANTE! Guardar los cambios
-			imagenService.actualizar(id, img);
+			// Redirigimos de vuelta a la gestión manteniendo la imagen seleccionada
+			return "redirect:/gestion/mis-pines?id=" + id;
+		} catch (Exception e) {
+			return "redirect:/gestion/mis-pines?erroru=true";
 		}
-
-		// Redirigimos de vuelta a la gestión manteniendo la imagen seleccionada
-		return "redirect:/gestion/mis-pines?id=" + id;
 	}
 
 	@GetMapping("/borrar/{id}")
 	public String borrar(@PathVariable Long id, HttpSession session) {
-	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-	    if (user == null) {
-	        return "redirect:/";
-	    }
+		try {
+			Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
+			if (user == null) {
+				return "redirect:/";
+			}
 
-	    Imagen selectedImg = imagenService.buscarPorId(id);
+			Imagen selectedImg = imagenService.buscarPorId(id);
 
-	    // Verificamos que la imagen existe y que el nombre del dueño coincide
-	    if (selectedImg == null || !user.getNombre().equals(selectedImg.getUsuario().getNombre())) {
-	        return "redirect:/gestion/mis-pines?erroru=true";
-	    }
+			// Verificamos que la imagen existe y que el nombre del dueño coincide
+			if (selectedImg == null || !user.getNombre().equals(selectedImg.getUsuario().getNombre())) {
+				return "redirect:/gestion/mis-pines?erroru=true";
+			}
 
-	    imagenService.borrar(id);
-	    return "redirect:/gestion/mis-pines";
+			imagenService.borrar(id);
+			return "redirect:/gestion/mis-pines";
+		} catch (Exception e) {
+			return "redirect:/gestion/mis-pines?erroru=true";
+		}
+
 	}
 }
