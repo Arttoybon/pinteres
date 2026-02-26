@@ -27,7 +27,7 @@
                     <img th:src="${img.enlace}" class="pin-img" th:alt="${img.titulo}">
                     <div class="p-2">
                         <p class="small fw-bold m-0" th:text="${img.titulo}"></p>
-                        <p class="text-muted mb-0" style="font-size: 0.75rem;">
+                        <p class="text-muted mb-0 text-xxs">
                             <a th:href="@{/usuario/perfil/{nombre}(nombre=${img.usuario.nombre})}"
                                 class="text-decoration-none text-muted">
                                 <span class="fw-bold" th:text="'@' + ${img.usuario.nombre}"></span>
@@ -73,7 +73,7 @@
         </div>
     </div>
 
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2050;">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="saveToast" class="toast align-items-center text-white bg-dark border-0 rounded-4" role="alert">
             <div class="d-flex">
                 <div class="toast-body"><i class="bi bi-check-circle-fill text-success me-2"></i> ¡Guardado en

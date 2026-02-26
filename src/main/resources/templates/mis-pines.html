@@ -1,51 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<script>
-        (function() {
-            const tema = localStorage.getItem('theme') || 'light';
-            if (tema === 'dark') {
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-            }
-        })();
-    </script>
+    <script th:src="@{/js/theme-init.js}"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Pint - Gestionar mis Pines</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        /* --- ESTILOS MODO OSCURO --- */
-        [data-bs-theme="dark"] body { background-color: #121212 !important; color: #f8f9fa; }
-        
-        [data-bs-theme="dark"] .card, [data-bs-theme="dark"] .bg-white { 
-            background-color: #1e1e1e !important; color: white !important; border: 1px solid #333 !important; 
-        }
-        
-        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .bg-light { 
-            background-color: #2b2b2b !important; border-color: #444 !important; color: white !important; 
-        }
-        
-        [data-bs-theme="dark"] .preview-box { background-color: #000; border: 1px solid #333; }
-        [data-bs-theme="dark"] .border-start { border-color: #333 !important; }
-        [data-bs-theme="dark"] .text-secondary, [data-bs-theme="dark"] label { color: #b0b0b0 !important; }
-
-        /* --- ESTILOS GENERALES --- */
-        body { transition: background-color 0.3s, color 0.3s; }
-        .thumb-link img { border-radius: 12px; height: 120px; object-fit: cover; width: 100%; transition: 0.3s; opacity: 0.7; }
-        .thumb-link:hover img { opacity: 1; transform: translateY(-3px); }
-        .selected-thumb img { border: 4px solid #dc3545; opacity: 1; transform: scale(1.05); }
-        .preview-box { border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-height: 500px; object-fit: contain; background-color: #f0f0f0; }
-        .sidebar-scroll { height: 85vh; overflow-y: auto; scrollbar-width: thin; }
-        
-        @media (min-width: 768px) { body { padding-left: 80px; } }
-        @media (max-width: 767.98px) {
-            body { padding-bottom: 90px; }
-            .sidebar-scroll { height: auto; overflow-y: visible; margin-bottom: 20px; }
-            .border-start { border-left: none !important; border-top: 1px solid #dee2e6; padding-top: 20px; margin-top: 20px; padding-left: 0 !important; }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
+
 <body class="bg-light">
 
     <div th:replace="~{navbar :: menuPrincipal}"></div>
@@ -54,7 +19,7 @@
         <div th:if="${param.erroru}" class="alert alert-warning py-2 rounded-pill small mb-3">
             <i class="bi bi-person-exclamation me-1"></i> Ese pin no te pertenece.
         </div>
-        
+
         <div th:if="${#lists.isEmpty(imagenes)}" class="text-center py-5">
             <i class="bi bi-cloud-upload display-1 text-muted"></i>
             <h2 class="mt-4 fw-bold">No tienes fotos todavía</h2>
@@ -66,9 +31,8 @@
             <div class="col-md-3 sidebar-scroll pe-3">
                 <div class="row g-3">
                     <div class="col-6" th:each="img : ${imagenes}">
-                        <a th:href="@{/gestion/mis-pines(id=${img.id})}" 
-                           class="thumb-link"
-                           th:classappend="${imgSeleccionada != null && imgSeleccionada.id == img.id} ? 'selected-thumb' : ''">
+                        <a th:href="@{/gestion/mis-pines(id=${img.id})}" class="thumb-link"
+                            th:classappend="${imgSeleccionada != null && imgSeleccionada.id == img.id} ? 'selected-thumb' : ''">
                             <img th:src="${img.enlace}" class="shadow-sm">
                         </a>
                     </div>
@@ -81,7 +45,7 @@
                         <img th:src="${imgSeleccionada?.enlace}" class="preview-box w-100 mb-4">
                         <p class="text-muted small">ID del Pin: <span th:text="${imgSeleccionada?.id}"></span></p>
                     </div>
-                    
+
                     <div class="col-lg-6">
                         <div class="card border-0 bg-white p-4 shadow-sm rounded-4">
                             <h2 class="fw-bold mb-4">Editar información</h2>
@@ -89,21 +53,21 @@
                                 <input type="hidden" name="id" th:value="${imgSeleccionada?.id}">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Título del Pin</label>
-                                    <input type="text" name="titulo" th:value="${imgSeleccionada?.titulo}" 
-                                           class="form-control rounded-3 p-3" required>
+                                    <input type="text" name="titulo" th:value="${imgSeleccionada?.titulo}"
+                                        class="form-control rounded-3 p-3" required>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label fw-bold">URL de la imagen</label>
-                                    <input type="text" name="enlace" th:value="${imgSeleccionada?.enlace}" 
-                                           class="form-control rounded-3 p-3" required>
+                                    <input type="text" name="enlace" th:value="${imgSeleccionada?.enlace}"
+                                        class="form-control rounded-3 p-3" required>
                                 </div>
                                 <div class="d-grid gap-3">
                                     <button type="submit" class="btn btn-dark btn-lg rounded-pill">
                                         <i class="bi bi-check-circle me-2"></i>Guardar cambios
                                     </button>
-                                    <a th:href="@{/gestion/borrar/{id}(id=${imgSeleccionada?.id})}" 
-                                       class="btn btn-outline-danger rounded-pill"
-                                       onclick="return confirm('¿Estás seguro?')">
+                                    <a th:href="@{/gestion/borrar/{id}(id=${imgSeleccionada?.id})}"
+                                        class="btn btn-outline-danger rounded-pill"
+                                        onclick="return confirm('¿Estás seguro?')">
                                         <i class="bi bi-trash me-2"></i>Eliminar permanentemente
                                     </a>
                                 </div>
@@ -117,4 +81,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

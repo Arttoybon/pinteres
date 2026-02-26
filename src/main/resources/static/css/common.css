@@ -158,3 +158,72 @@ body {
 @media (min-width: 768px) {
     body { padding-left: 80px; }
 }
+
+/* --- Utility classes used across templates --- */
+.max-width-500 { max-width: 500px; }
+.cursor-pointer { cursor: pointer !important; }
+.text-xxs { font-size: 0.75rem !important; }
+/* toast containers often use fixed positioning */
+.toast-container { z-index: 2050; }
+
+/* --- Thumbnail / gallery styles (mis-pines page) --- */
+.thumb-link img {
+    border-radius: 12px;
+    height: 120px;
+    object-fit: cover;
+    width: 100%;
+    transition: 0.3s;
+    opacity: 0.7;
+}
+.thumb-link:hover img {
+    opacity: 1;
+    transform: translateY(-3px);
+}
+.selected-thumb img {
+    border: 4px solid #dc3545;
+    opacity: 1;
+    transform: scale(1.05);
+}
+.preview-box {
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    max-height: 500px;
+    object-fit: contain;
+    background-color: #f0f0f0;
+}
+.sidebar-scroll {
+    height: 85vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+/* dark theme overrides for mis-pines-specific elements */
+[data-bs-theme="dark"] .preview-box {
+    background-color: #000;
+    border: 1px solid #333;
+}
+[data-bs-theme="dark"] .border-start {
+    border-color: #333 !important;
+}
+[data-bs-theme="dark"] .text-secondary,
+[data-bs-theme="dark"] label {
+    color: #b0b0b0 !important;
+}
+
+@media (max-width: 767.98px) {
+    body { padding-bottom: 90px; }
+
+    .sidebar-scroll {
+        height: auto;
+        overflow-y: visible;
+        margin-bottom: 20px;
+    }
+
+    .border-start {
+        border-left: none !important;
+        border-top: 1px solid #dee2e6;
+        padding-top: 20px;
+        margin-top: 20px;
+        padding-left: 0 !important;
+    }
+}
