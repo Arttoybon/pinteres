@@ -37,7 +37,8 @@ public class LoginController {
 
 	@PostMapping("/login")
 	public String login(@RequestParam String nombre, @RequestParam String contrasenya, HttpSession session) {
-		Optional<Usuario> usuario = usuarioRepository.findById(nombre);
+		String nombreMin = (nombre != null) ? nombre.toLowerCase().trim() : "";
+		Optional<Usuario> usuario = usuarioRepository.findById(nombreMin);
 
 		if (usuario.isPresent() && encoder.matches(contrasenya, usuario.get().getContrasenya())) {
 			session.setAttribute("usuarioLogueado", usuario.get());
@@ -55,7 +56,8 @@ public class LoginController {
 	@PostMapping("/recuperar-password")
 	public String sendEmail(@RequestParam("usuario") String nombre) {
 		try {
-			Optional<Usuario> usuarioOpt = usuarioRepository.findById(nombre);
+			String nombreMin = (nombre != null) ? nombre.toLowerCase().trim() : "";
+			Optional<Usuario> usuarioOpt = usuarioRepository.findById(nombreMin);
 
 			if (usuarioOpt.isPresent()) {
 				Usuario usuario = usuarioOpt.get();

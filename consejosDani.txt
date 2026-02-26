@@ -1,2 +1,3 @@
--ver perfil de otros usuarios
+-pruebas unitarias
+-almacenar nombres en minusculas
 - <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -42,4 +42,10 @@ public class Usuario {
 	    inverseJoinColumns = @JoinColumn(name = "imagen_id")
 	)
 	private List<Imagen> guardados = new ArrayList<>();
+	
+	public void setNombre(String nombre) {
+        if (nombre != null) {
+            this.nombre = nombre.toLowerCase().trim();
+        }
+    }
 }

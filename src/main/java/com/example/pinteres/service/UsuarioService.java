@@ -41,12 +41,13 @@ public class UsuarioService {
 
 	// READ BY ID
 	public Usuario buscarPorNombre(String nombre) {
-		return usuResp.findById(nombre).orElse(null);
+		return usuResp.findById(nombre.toLowerCase().trim()).orElse(null);
 	}
 
 	// UPDATE
 	@Transactional
 	public Usuario actualizar(String nombreAntiguo, Usuario usuNuevos, String nuevaPass) {
+		nombreAntiguo=nombreAntiguo.toLowerCase().trim();
 	    Usuario u = usuResp.findById(nombreAntiguo)
 	            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 

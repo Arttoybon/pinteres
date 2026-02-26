@@ -33,12 +33,14 @@ public class UsuarioControler {
 	@PostMapping("/registrar")
 	public String registrarUsuario(@RequestParam String nombre, @RequestParam String contrasenya,
 			@RequestParam String correo) { // Recibe el correo
-		if (usuarioService.buscarPorNombre(nombre) != null || nombre.trim().equals("")) {
+		
+		String nombreMin = (nombre != null) ? nombre.toLowerCase().trim() : "";
+		if (usuarioService.buscarPorNombre(nombreMin) != null || nombreMin.equals("")) {
 			return "redirect:/?existe=true";
 		}
 
 		Usuario nuevo = new Usuario();
-		nuevo.setNombre(nombre);
+		nuevo.setNombre(nombreMin);
 		nuevo.setContrasenya(contrasenya);
 		nuevo.setCorreo(correo);
 
