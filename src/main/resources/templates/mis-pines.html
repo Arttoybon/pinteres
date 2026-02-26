@@ -12,16 +12,14 @@
         .selected-thumb img { border: 4px solid #dc3545; opacity: 1; transform: scale(1.05); }
         .preview-box { border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-height: 500px; object-fit: contain; background-color: #f0f0f0; }
         .sidebar-scroll { height: 85vh; overflow-y: auto; scrollbar-width: thin; }
+    	@media (min-width: 768px) {
+   		body { padding-left: 80px; }
+		}
     </style>
 </head>
 <body class="bg-light">
 
-    <nav class="navbar navbar-white bg-white border-bottom mb-4 shadow-sm">
-        <div class="container">
-            <a th:href="@{/home}" class=" rounded-pill border btn btn-danger text-white"><i class=" bi bi-arrow-left"></i> Volver</a>
-            <span class="navbar-brand fw-bold text-danger"><i class="bi bi-pinterest"></i> Mis Pines</span>
-        </div>
-    </nav>
+    <nav th:replace="~{navbar :: menuPrincipal}"></nav>
 
     <div class="container-fluid px-5">
         <div th:if="${param.erroru}" class="alert alert-warning py-2 rounded-pill small mb-3">

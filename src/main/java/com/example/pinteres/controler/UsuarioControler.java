@@ -108,7 +108,6 @@ public class UsuarioControler {
 		return "redirect:/?actualizado=true";
 	}
 
-
 	@PostMapping("/actualizar-perfil")
 	public String procesarActualizacion(@RequestParam String nuevoNombre,
 	                                   @RequestParam String correo,
@@ -118,18 +117,18 @@ public class UsuarioControler {
 	    Usuario logueado = (Usuario) session.getAttribute("usuarioLogueado");
 	    if (logueado == null) return "redirect:/";
 
-	    // Creamos un objeto temporal solo para transportar los datos al service
+	    // Creamos un objeto temporal para el service
 	    Usuario datosNuevos = new Usuario();
-	    datosNuevos.setNombre(nuevoNombre);
-	    datosNuevos.setCorreo(correo);
+	    datosNuevos.setNombre(nuevoNombre.trim()); // Aquí sí es útil el trim para el valor
+	    datosNuevos.setCorreo(correo.trim());
 
-	    // Llamamos al service corregido
+	    // Llamamos al service
 	    Usuario actualizado = usuarioService.actualizar(logueado.getNombre(), datosNuevos, nuevaPass);
 
-	    // Actualizamos la sesión para que el resto de la web sepa que ahora te llamas distinto
+	    // Actualizamos la sesión para que la Navbar muestre el nuevo nombre
 	    session.setAttribute("usuarioLogueado", actualizado);
 	    
-	    return "redirect:/home?exito=true";
+	    return "redirect:/usuario/mi-perfil?exito=true";
 	}
 
 	@PostMapping("/eliminar-cuenta")

@@ -1,3 +1,3 @@
 -pruebas unitarias
--almacenar nombres en minusculas
+-modo oscuro
 - <meta name="viewport" content="width=device-width, initial-scale=1.0">
