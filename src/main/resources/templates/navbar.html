@@ -7,17 +7,13 @@
 
 <div th:fragment="menuPrincipal">
     <style>
-        /* Configuración de Escritorio */
+        /* --- BASE NAVBAR --- */
         .navbar-desktop {
-            width: 80px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 1050;
-            transition: background-color 0.3s;
+            width: 80px; position: fixed; left: 0; top: 0;
+            z-index: 1050; transition: all 0.3s;
         }
 
-        /* Colores dinámicos para el modo oscuro manual */
+        /* --- MODO OSCURO AUTOMÁTICO PARA NAVBAR --- */
         [data-bs-theme="dark"] .navbar-desktop, 
         [data-bs-theme="dark"] .navbar-top-mobile, 
         [data-bs-theme="dark"] .navbar-mobile-bottom {
@@ -25,50 +21,60 @@
             border-color: #333 !important;
         }
 
-        /* Configuración de Móvil (Barra Inferior) */
+        /* Iconos de la barra lateral en blanco cuando hay modo oscuro */
+        [data-bs-theme="dark"] .navbar-desktop .nav-link i, 
+        [data-bs-theme="dark"] .navbar-desktop .btn i,
+        [data-bs-theme="dark"] .navbar-mobile-bottom i {
+            color: #f8f9fa !important;
+        }
+
+        /* EL BOTÓN DE PERFIL (Nombre de usuario) */
+        /* En modo claro: Blanco con borde */
+        .btn-perfil-usuario {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            color: #212529;
+            transition: all 0.3s;
+        }
+
+        /* En modo oscuro: Gris oscuro/Negro */
+        [data-bs-theme="dark"] .btn-perfil-usuario {
+            background-color: #2b2b2b !important;
+            border-color: #444 !important;
+            color: #f8f9fa !important;
+        }
+
+        /* Efecto hover para que sepa que es un botón */
+        .btn-perfil-usuario:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-1px);
+        }
+        [data-bs-theme="dark"] .btn-perfil-usuario:hover {
+            background-color: #3d3d3d !important;
+        }
+
+        /* --- RESPONSIVE --- */
         @media (max-width: 767.98px) {
             .navbar-mobile-bottom {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                z-index: 1055; 
-                height: 70px;
-                background-color: white;
-                display: flex !important; 
-                align-items: center;
+                position: fixed; bottom: 0; left: 0; right: 0;
+                z-index: 1055; height: 70px; background-color: white;
+                display: flex !important; align-items: center;
                 border-top: 1px solid #dee2e6;
             }
             .navbar-top-mobile { display: none !important; }
         }
-
-        /* Clase para que los iconos cambien de color al hover */
-        .theme-toggle-btn:hover {
-            opacity: 0.7;
-        }
     </style>
 
     <div class="d-none d-md-flex flex-column align-items-center bg-white vh-100 border-end py-3 shadow-sm navbar-desktop">
-        
         <a th:href="@{/home}" class="mb-4 text-danger"><i class="bi bi-pinterest fs-1"></i></a>
         
-        <a th:href="@{/home}" class="nav-link p-3 text-dark">
-            <i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i>
-        </a>
-        
-        <a th:href="@{/gestion/mis-pines}" class="nav-link p-3 text-dark">
-            <i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i>
-        </a>
-        
-        <a th:href="@{/mis-guardados}" class="nav-link p-3 text-dark">
-            <i th:class="${paginaActiva == 'guardados' ? 'bi bi-heart-fill fs-2 text-danger' : 'bi bi-heart fs-2 text-danger'}"></i>
-        </a>
+        <a th:href="@{/home}" class="nav-link p-3"><i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i></a>
+        <a th:href="@{/gestion/mis-pines}" class="nav-link p-3"><i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i></a>
+        <a th:href="@{/mis-guardados}" class="nav-link p-3"><i th:class="${paginaActiva == 'guardados' ? 'bi bi-heart-fill fs-2 text-danger' : 'bi bi-heart fs-2 text-danger'}"></i></a>
 
-        <button class="btn p-3 text-dark" data-bs-toggle="modal" data-bs-target="#uploadModal">
-            <i class="bi bi-plus-square fs-2"></i>
-        </button>
+        <button class="btn p-3" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
 
-        <button class="btn p-3 text-dark mt-2 theme-toggle-btn">
+        <button class="btn p-3 mt-2 theme-toggle-btn">
             <i class="bi bi-moon-fill fs-2 theme-icon"></i>
         </button>
         
@@ -76,12 +82,12 @@
     </div>
 
     <nav class="navbar navbar-expand bg-white sticky-top py-3 mb-4 shadow-sm navbar-top-mobile">
-        <div class="container-fluid d-flex justify-content-end align-items-center">
+        <div class="container-fluid d-flex justify-content-end">
             <div th:if="${session.usuarioLogueado != null}">
                 <a th:href="@{/usuario/mi-perfil}" class="text-decoration-none me-2">
-                    <button class="btn btn-light rounded-pill border shadow-sm d-flex align-items-center gap-2">
+                    <button class="btn btn-perfil-usuario rounded-pill shadow-sm d-flex align-items-center gap-2 px-3 py-2">
                         <i class="bi bi-person-circle fs-5"></i>
-                        <span th:text="${session.usuarioLogueado.nombre}"></span>
+                        <span class="fw-bold" th:text="${session.usuarioLogueado.nombre}"></span>
                     </button>
                 </a>
             </div>
@@ -90,25 +96,10 @@
 
     <div class="navbar-mobile-bottom d-md-none shadow-lg">
         <div class="d-flex justify-content-around align-items-center w-100 px-2">
-            <a th:href="@{/home}" class="text-dark">
-                <i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i>
-            </a>
-            
-            <a th:href="@{/gestion/mis-pines}" class="text-dark">
-                <i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i>
-            </a>
-
-            <button class="btn text-dark p-0 theme-toggle-btn">
-                <i class="bi bi-moon-fill fs-2 theme-icon"></i>
-            </button>
-
-            <button class="btn text-dark p-0" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                <i class="bi bi-plus-circle-fill fs-1 text-danger"></i>
-            </button>
-            
-            <a th:href="@{/usuario/mi-perfil}" class="text-dark">
-                <i th:class="${paginaActiva == 'perfil' ? 'bi bi-person-circle-fill fs-2' : 'bi bi-person-circle fs-2'}"></i>
-            </a>
+            <a th:href="@{/home}" class="text-dark"><i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i></a>
+            <button class="btn p-0 theme-toggle-btn"><i class="bi bi-moon-fill fs-2 theme-icon"></i></button>
+            <button class="btn p-0" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-circle-fill fs-1 text-danger"></i></button>
+            <a th:href="@{/usuario/mi-perfil}" class="text-dark"><i th:class="${paginaActiva == 'perfil' ? 'bi bi-person-circle-fill fs-2' : 'bi bi-person-circle fs-2'}"></i></a>
         </div>
     </div>
 </div>

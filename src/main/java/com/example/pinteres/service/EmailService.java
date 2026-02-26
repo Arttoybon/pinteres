@@ -12,7 +12,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 @Service
-public class EmailService implements EmailInterface {
+public class EmailService implements EmailInterface{
 
 	private final JavaMailSender javaMailSender;
 
@@ -23,7 +23,6 @@ public class EmailService implements EmailInterface {
 		this.javaMailSender = javaMailSender;
 		this.templateEngine = templateEngine;
 	}
-
 	@Override
 	public void sendMail(Email email) throws MessagingException {
 		try {
