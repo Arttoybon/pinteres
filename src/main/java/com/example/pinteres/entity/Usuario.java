@@ -3,6 +3,9 @@ package com.example.pinteres.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,6 +44,7 @@ public class Usuario {
 	    joinColumns = @JoinColumn(name = "usuario_nombre"),
 	    inverseJoinColumns = @JoinColumn(name = "imagen_id")
 	)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private List<Imagen> guardados = new ArrayList<>();
 
 	public void setNombre(String nombre) {

@@ -1,5 +1,6 @@
 package com.example.pinteres.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,7 +25,8 @@ public class Imagen {
 
 	private String titulo;
 
-	private String enlace;
+	@Column( length = 1000)
+    private String enlace;
 
 	@ManyToOne
 	@JoinColumn(name = "usuario_nombre")
