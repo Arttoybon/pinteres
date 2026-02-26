@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+<script>
+        (function() {
+            const tema = localStorage.getItem('theme') || 'light';
+            if (tema === 'dark') {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+            }
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Pint - Gestionar mis Pines</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        /* --- ESTILOS MODO OSCURO (MIS PINES) --- */
+        /* --- ESTILOS MODO OSCURO --- */
         [data-bs-theme="dark"] body { background-color: #121212 !important; color: #f8f9fa; }
         
-        /* Forzar color de iconos y textos en modo oscuro */
-        [data-bs-theme="dark"] .bi:not(.text-danger):not(.text-warning), 
-        [data-bs-theme="dark"] h2, 
-        [data-bs-theme="dark"] h4, 
-        [data-bs-theme="dark"] label { 
-            color: #f8f9fa !important; 
-        }
-
         [data-bs-theme="dark"] .card, [data-bs-theme="dark"] .bg-white { 
-            background-color: #1e1e1e !important; color: white; border: 1px solid #333 !important; 
+            background-color: #1e1e1e !important; color: white !important; border: 1px solid #333 !important; 
         }
         
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .bg-light { 
@@ -28,10 +29,9 @@
         
         [data-bs-theme="dark"] .preview-box { background-color: #000; border: 1px solid #333; }
         [data-bs-theme="dark"] .border-start { border-color: #333 !important; }
-        [data-bs-theme="dark"] .text-secondary { color: #b0b0b0 !important; }
-        [data-bs-theme="dark"] .text-muted { color: #888 !important; }
+        [data-bs-theme="dark"] .text-secondary, [data-bs-theme="dark"] label { color: #b0b0b0 !important; }
 
-        /* --- ESTILOS ORIGINALES --- */
+        /* --- ESTILOS GENERALES --- */
         body { transition: background-color 0.3s, color 0.3s; }
         .thumb-link img { border-radius: 12px; height: 120px; object-fit: cover; width: 100%; transition: 0.3s; opacity: 0.7; }
         .thumb-link:hover img { opacity: 1; transform: translateY(-3px); }
@@ -39,9 +39,7 @@
         .preview-box { border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-height: 500px; object-fit: contain; background-color: #f0f0f0; }
         .sidebar-scroll { height: 85vh; overflow-y: auto; scrollbar-width: thin; }
         
-    	@media (min-width: 768px) {
-   		    body { padding-left: 80px; }
-		}
+        @media (min-width: 768px) { body { padding-left: 80px; } }
         @media (max-width: 767.98px) {
             body { padding-bottom: 90px; }
             .sidebar-scroll { height: auto; overflow-y: visible; margin-bottom: 20px; }
@@ -55,8 +53,8 @@
 
     <div class="container-fluid px-3 px-md-5 mt-4">
         <div th:if="${param.erroru}" class="alert alert-warning py-2 rounded-pill small mb-3">
-	        <i class="bi bi-person-exclamation me-1"></i> Ese pin no te pertenece.
-	    </div>
+            <i class="bi bi-person-exclamation me-1"></i> Ese pin no te pertenece.
+        </div>
         
         <div th:if="${#lists.isEmpty(imagenes)}" class="text-center py-5">
             <i class="bi bi-cloud-upload display-1 text-muted"></i>
@@ -66,7 +64,6 @@
         </div>
 
         <div th:if="${!#lists.isEmpty(imagenes)}" class="row">
-            
             <div class="col-md-3 sidebar-scroll pe-3">
                 <div class="row g-3">
                     <div class="col-6" th:each="img : ${imagenes}">
@@ -81,7 +78,6 @@
 
             <div class="col-md-9 border-start ps-md-5" th:if="${imgSeleccionada != null}">
                 <div class="row align-items-start">
-                    
                     <div class="col-lg-6 text-center">
                         <img th:src="${imgSeleccionada?.enlace}" class="preview-box w-100 mb-4">
                         <p class="text-muted small">ID del Pin: <span th:text="${imgSeleccionada?.id}"></span></p>
@@ -90,22 +86,18 @@
                     <div class="col-lg-6">
                         <div class="card border-0 bg-white p-4 shadow-sm rounded-4">
                             <h2 class="fw-bold mb-4">Editar información</h2>
-                            
                             <form th:action="@{/gestion/editar}" method="post">
                                 <input type="hidden" name="id" th:value="${imgSeleccionada?.id}">
-                                
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold text-secondary">Título del Pin</label>
+                                    <label class="form-label fw-bold">Título del Pin</label>
                                     <input type="text" name="titulo" th:value="${imgSeleccionada?.titulo}" 
-                                           class="form-control rounded-3 border-light bg-light p-3" required>
+                                           class="form-control rounded-3 p-3" required>
                                 </div>
-                                
                                 <div class="mb-4">
-                                    <label class="form-label fw-bold text-secondary">URL de la imagen</label>
+                                    <label class="form-label fw-bold">URL de la imagen</label>
                                     <input type="text" name="enlace" th:value="${imgSeleccionada?.enlace}" 
-                                           class="form-control rounded-3 border-light bg-light p-3" required>
+                                           class="form-control rounded-3 p-3" required>
                                 </div>
-
                                 <div class="d-grid gap-3">
                                     <button type="submit" class="btn btn-dark btn-lg rounded-pill">
                                         <i class="bi bi-check-circle me-2"></i>Guardar cambios
@@ -125,37 +117,5 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const htmlElement = document.documentElement;
-
-            const aplicarTema = (tema) => {
-                htmlElement.setAttribute('data-bs-theme', tema);
-                const icons = document.querySelectorAll('.theme-icon');
-                icons.forEach(icon => {
-                    if(tema === 'dark') {
-                        icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
-                        icon.classList.add('text-warning');
-                    } else {
-                        icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
-                        icon.classList.remove('text-warning');
-                    }
-                });
-            };
-
-            const temaGuardado = localStorage.getItem('theme') || 'light';
-            aplicarTema(temaGuardado);
-
-            document.addEventListener('click', (e) => {
-                const btn = e.target.closest('.theme-toggle-btn');
-                if (btn) {
-                    const nuevoTema = htmlElement.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
-                    aplicarTema(nuevoTema);
-                    localStorage.setItem('theme', nuevoTema);
-                }
-            });
-        });
-    </script>
 </body>
 </html>

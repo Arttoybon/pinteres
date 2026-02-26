@@ -13,45 +13,35 @@
             z-index: 1050; transition: all 0.3s;
         }
 
-        /* --- MODO OSCURO AUTOMÁTICO PARA NAVBAR --- */
+        /* --- MODO OSCURO AUTOMÁTICO --- */
         [data-bs-theme="dark"] .navbar-desktop, 
         [data-bs-theme="dark"] .navbar-top-mobile, 
-        [data-bs-theme="dark"] .navbar-mobile-bottom {
+        [data-bs-theme="dark"] .navbar-mobile-bottom,
+        [data-bs-theme="dark"] .modal-content {
             background-color: #1e1e1e !important;
             border-color: #333 !important;
+            color: white !important;
         }
 
-        /* Iconos de la barra lateral en blanco cuando hay modo oscuro */
-        [data-bs-theme="dark"] .navbar-desktop .nav-link i, 
-        [data-bs-theme="dark"] .navbar-desktop .btn i,
-        [data-bs-theme="dark"] .navbar-mobile-bottom i {
+        /* --- TRUCO ANTIPARPADEO DE ICONOS --- */
+        .theme-icon.bi-sun-fill { display: none !important; } /* Por defecto oculto */
+
+        [data-bs-theme="dark"] .theme-icon.bi-moon-fill { display: none !important; }
+        [data-bs-theme="dark"] .theme-icon.bi-sun-fill { 
+            display: inline-block !important; 
+            color: #ffc107 !important; 
+        }
+
+        [data-bs-theme="dark"] .navbar-desktop i, 
+        [data-bs-theme="dark"] .navbar-mobile-bottom i:not(.bi-sun-fill) {
             color: #f8f9fa !important;
         }
 
-        /* EL BOTÓN DE PERFIL (Nombre de usuario) */
-        /* En modo claro: Blanco con borde */
-        .btn-perfil-usuario {
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            color: #212529;
-            transition: all 0.3s;
-        }
-
-        /* En modo oscuro: Gris oscuro/Negro */
-        [data-bs-theme="dark"] .btn-perfil-usuario {
-            background-color: #2b2b2b !important;
-            border-color: #444 !important;
-            color: #f8f9fa !important;
-        }
-
-        /* Efecto hover para que sepa que es un botón */
-        .btn-perfil-usuario:hover {
-            background-color: #f8f9fa;
-            transform: translateY(-1px);
-        }
-        [data-bs-theme="dark"] .btn-perfil-usuario:hover {
-            background-color: #3d3d3d !important;
-        }
+        /* Ajustes Modal y Botones */
+        [data-bs-theme="dark"] .modal-content .form-control { background-color: #2b2b2b !important; border-color: #444 !important; color: white !important; }
+        [data-bs-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+        .btn-perfil-usuario { background-color: #ffffff; border: 1px solid #dee2e6; color: #212529; transition: all 0.3s; }
+        [data-bs-theme="dark"] .btn-perfil-usuario { background-color: #2b2b2b !important; border-color: #444 !important; color: #f8f9fa !important; }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 767.98px) {
@@ -67,17 +57,14 @@
 
     <div class="d-none d-md-flex flex-column align-items-center bg-white vh-100 border-end py-3 shadow-sm navbar-desktop">
         <a th:href="@{/home}" class="mb-4 text-danger"><i class="bi bi-pinterest fs-1"></i></a>
-        
         <a th:href="@{/home}" class="nav-link p-3"><i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i></a>
         <a th:href="@{/gestion/mis-pines}" class="nav-link p-3"><i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i></a>
         <a th:href="@{/mis-guardados}" class="nav-link p-3"><i th:class="${paginaActiva == 'guardados' ? 'bi bi-heart-fill fs-2 text-danger' : 'bi bi-heart fs-2 text-danger'}"></i></a>
-
         <button class="btn p-3" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
-
         <button class="btn p-3 mt-2 theme-toggle-btn">
             <i class="bi bi-moon-fill fs-2 theme-icon"></i>
+            <i class="bi bi-sun-fill fs-2 theme-icon"></i>
         </button>
-        
         <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
     </div>
 
@@ -95,14 +82,64 @@
     </nav>
 
     <div class="navbar-mobile-bottom d-md-none shadow-lg">
-        <div class="d-flex justify-content-around align-items-center w-100 px-2">
+        <div class="d-flex justify-content-around align-items-center w-100 px-1">
             <a th:href="@{/home}" class="text-dark"><i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i></a>
-            <button class="btn p-0 theme-toggle-btn"><i class="bi bi-moon-fill fs-2 theme-icon"></i></button>
+            <a th:href="@{/gestion/mis-pines}" class="text-dark"><i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i></a>
             <button class="btn p-0" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-circle-fill fs-1 text-danger"></i></button>
+            <button class="btn p-0 theme-toggle-btn">
+                <i class="bi bi-moon-fill fs-2 theme-icon"></i>
+                <i class="bi bi-sun-fill fs-2 theme-icon"></i>
+            </button>
             <a th:href="@{/usuario/mi-perfil}" class="text-dark"><i th:class="${paginaActiva == 'perfil' ? 'bi bi-person-circle-fill fs-2' : 'bi bi-person-circle fs-2'}"></i></a>
         </div>
     </div>
-</div>
 
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Crear Pin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/publicar}" method="post">
+                    <div class="modal-body text-start">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Título</label>
+                            <input type="text" name="titulo" class="form-control rounded-pill" placeholder="¿Qué quieres mostrar?" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">URL de la imagen</label>
+                            <input type="text" name="enlace" class="form-control rounded-pill" placeholder="Pega el enlace de la imagen" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold">Publicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const htmlElement = document.documentElement;
+            const aplicarTema = (tema) => {
+                htmlElement.setAttribute('data-bs-theme', tema);
+            };
+
+            const temaGuardado = localStorage.getItem('theme') || 'light';
+            aplicarTema(temaGuardado);
+
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.theme-toggle-btn');
+                if (btn) {
+                    const nuevoTema = htmlElement.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
+                    aplicarTema(nuevoTema);
+                    localStorage.setItem('theme', nuevoTema);
+                }
+            });
+        })();
+    </script>
+</div>
 </body>
 </html>
