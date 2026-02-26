@@ -26,14 +26,14 @@ public class UsuarioControler {
 
 	@Autowired
 	private ImagenService imagenService;
-	
+
 	@Autowired
 	private UsuarioService usuarioService;
 
 	@PostMapping("/registrar")
 	public String registrarUsuario(@RequestParam String nombre, @RequestParam String contrasenya,
 			@RequestParam String correo) { // Recibe el correo
-		
+
 		String nombreMin = (nombre != null) ? nombre.toLowerCase().trim() : "";
 		if (usuarioService.buscarPorNombre(nombreMin) != null || nombreMin.equals("")) {
 			return "redirect:/?existe=true";
@@ -113,9 +113,11 @@ public class UsuarioControler {
 	                                   @RequestParam String correo,
 	                                   @RequestParam(required = false) String nuevaPass,
 	                                   HttpSession session) {
-	    
+
 	    Usuario logueado = (Usuario) session.getAttribute("usuarioLogueado");
-	    if (logueado == null) return "redirect:/";
+	    if (logueado == null) {
+			return "redirect:/";
+		}
 
 	    // Creamos un objeto temporal para el service
 	    Usuario datosNuevos = new Usuario();
@@ -127,28 +129,28 @@ public class UsuarioControler {
 
 	    // Actualizamos la sesión para que la Navbar muestre el nuevo nombre
 	    session.setAttribute("usuarioLogueado", actualizado);
-	    
+
 	    return "redirect:/usuario/mi-perfil?exito=true";
 	}
 
 	@PostMapping("/eliminar-cuenta")
 	public String eliminarCuenta(HttpSession session) {
 	    Usuario logueado = (Usuario) session.getAttribute("usuarioLogueado");
-	    
+
 	    if (logueado != null) {
 	        usuarioService.eliminarCuenta(logueado.getNombre());
 	        // Destruimos la sesión para que no pueda seguir navegando
 	        session.invalidate();
 	    }
-	    
+
 	    return "redirect:/?cuentaEliminada=true";
 	}
-	
+
 	@GetMapping("/mi-perfil")
     public String miPerfil(Model model, HttpSession session) {
         // 1. Obtener el usuario de la sesión
         Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
-        
+
         if (usuarioLogueado == null) {
             return "redirect:/login";
         }
@@ -161,9 +163,9 @@ public class UsuarioControler {
         model.addAttribute("usuario", usuarioLogueado);
         model.addAttribute("publicaciones", misPublicaciones);
         model.addAttribute("esMiPerfil", true);
-        
+
         // ESTO ARREGLA EL ERROR "null context object" en perfil-usuario.html
-        model.addAttribute("imagenService", imagenService); 
+        model.addAttribute("imagenService", imagenService);
 
         return "perfil-usuario";
     }
@@ -172,8 +174,8 @@ public class UsuarioControler {
     public String perfilPublico(@PathVariable String nombre, Model model, HttpSession session) {
         // 1. Buscar al usuario cuyo perfil queremos ver
         // (Asumo que tienes un método buscarPorNombre en tu UsuarioService)
-        Usuario usuarioVer = usuarioService.buscarPorNombre(nombre); 
-        
+        Usuario usuarioVer = usuarioService.buscarPorNombre(nombre);
+
         if (usuarioVer == null) {
             return "redirect:/home";
         }

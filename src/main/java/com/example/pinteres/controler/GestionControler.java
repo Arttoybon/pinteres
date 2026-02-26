@@ -27,8 +27,9 @@ public class GestionControler {
 	@GetMapping("/mis-pines")
 	public String vistaGestion(@RequestParam(required = false) Long id, Model model, HttpSession session) {
 		Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-		if (user == null)
+		if (user == null) {
 			return "redirect:/";
+		}
 
 		List<Imagen> misImagenes = imagenService.imagenesDeUsuario(user.getNombre());
 		model.addAttribute("imagenes", misImagenes);
@@ -46,9 +47,9 @@ public class GestionControler {
 		}
 
 		model.addAttribute("imgSeleccionada", seleccionada);
-		
+
 		model.addAttribute("paginaActiva", "pines");
-		
+
 		return "mis-pines";
 	}
 

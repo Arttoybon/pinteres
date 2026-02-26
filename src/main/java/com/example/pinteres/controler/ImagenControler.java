@@ -32,14 +32,14 @@ public class ImagenControler {
 	    if (session.getAttribute("usuarioLogueado") == null) {
 	        return "redirect:/";
 	    }
-	    
+
 	    model.addAttribute("imagenes", imagenService.listarTodas());
 	    model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-	    model.addAttribute("imagenService", imagenService); 
-	    
+	    model.addAttribute("imagenService", imagenService);
+
 	    // Cambiamos "pagina" por "paginaActiva" para que coincida con el Navbar
 	    model.addAttribute("paginaActiva", "home");
-	    
+
 	    return "home";
 	}
 
@@ -65,7 +65,9 @@ public class ImagenControler {
 	@GetMapping("/mis-pines")
 	public String vistaGestion(Model model, HttpSession session) {
 	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-	    if (user == null) return "redirect:/";
+	    if (user == null) {
+			return "redirect:/";
+		}
 
 	    List<Imagen> misImagenes = imagenService.imagenesDeUsuario(user.getNombre());
 	    model.addAttribute("imagenes", misImagenes);
@@ -84,8 +86,10 @@ public class ImagenControler {
 	@ResponseBody
 	public boolean toggleLike(@PathVariable Long id, HttpSession session) {
 	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-	    if (user == null) return false;
-	    
+	    if (user == null) {
+			return false;
+		}
+
 	    // Modificaremos el service para que devuelva si tras el click está guardado o no
 	    return imagenService.toggleLike(id, user.getNombre());
 	}
@@ -93,13 +97,15 @@ public class ImagenControler {
 	@GetMapping("/mis-guardados")
 	public String vistaGuardados(Model model, HttpSession session) {
 	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-	    if (user == null) return "redirect:/";
+	    if (user == null) {
+			return "redirect:/";
+		}
 
 	    model.addAttribute("imagenes", imagenService.listarGuardadas(user.getNombre()));
 	    model.addAttribute("tituloPagina", "Mis Favoritos");
-	    model.addAttribute("imagenService", imagenService); 
+	    model.addAttribute("imagenService", imagenService);
 	    model.addAttribute("paginaActiva", "guardados"); // <--- Identificador para Favoritos
 
-	    return "home"; 
+	    return "home";
 	}
 }

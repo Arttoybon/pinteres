@@ -73,9 +73,8 @@
         <div class="d-flex justify-content-around align-items-center w-100 px-1">
             <a th:href="@{/home}" class="text-dark"><i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i></a>
             <a th:href="@{/gestion/mis-pines}" class="text-dark"><i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i></a>
-            
             <button class="btn p-0" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-circle-fill fs-1 text-danger"></i></button>
-            
+            <a th:href="@{/mis-guardados}" class="text-dark"><i th:class="${paginaActiva == 'guardados' ? 'bi bi-heart-fill fs-2 text-danger' : 'bi bi-heart fs-2 text-danger'}"></i></a>
             <a th:href="@{/usuario/mi-perfil}" class="text-dark"><i th:class="${paginaActiva == 'perfil' ? 'bi bi-person-circle-fill fs-2' : 'bi bi-person-circle fs-2'}"></i></a>
         </div>
     </div>

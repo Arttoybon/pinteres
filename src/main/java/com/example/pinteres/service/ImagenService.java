@@ -52,7 +52,7 @@ public class ImagenService {
 	public void borrar(Long id) {
 		imgRep.deleteById(id);
 	}
-	
+
 	public boolean toggleLike(Long imagenId, String nombreUsuario) {
 	    Usuario usuario = usuResp.findById(nombreUsuario)
 	        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -74,7 +74,9 @@ public class ImagenService {
 	// Necesitas este método extra para saber el estado inicial al cargar las fotos
 	public boolean estaGuardado(Long imagenId, String nombreUsuario) {
 	    Usuario usuario = usuResp.findById(nombreUsuario).orElse(null);
-	    if (usuario == null) return false;
+	    if (usuario == null) {
+			return false;
+		}
 	    return usuario.getGuardados().stream().anyMatch(img -> img.getId().equals(imagenId));
 	}
 
@@ -83,7 +85,7 @@ public class ImagenService {
 	    Usuario usuario = usuResp.findById(nombreUsuario).get();
 	    return usuario.getGuardados();
 	}
-	
 
-	
+
+
 }

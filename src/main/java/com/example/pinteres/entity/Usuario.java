@@ -34,7 +34,7 @@ public class Usuario {
 
 	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Imagen> galeria = new ArrayList<>();
-	
+
 	@ManyToMany
 	@JoinTable(
 	    name = "usuario_favoritos",
@@ -42,7 +42,7 @@ public class Usuario {
 	    inverseJoinColumns = @JoinColumn(name = "imagen_id")
 	)
 	private List<Imagen> guardados = new ArrayList<>();
-	
+
 	public void setNombre(String nombre) {
         if (nombre != null) {
             this.nombre = nombre.toLowerCase().trim();

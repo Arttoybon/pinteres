@@ -12,7 +12,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let currentId = null;
     let lastTap = 0; // Para móvil
+    const htmlElement = document.documentElement;
+    const darkModeSwitch = document.getElementById('darkModeSwitch');
 
+    // Solo actuamos si el switch existe en el DOM
+    if (darkModeSwitch) {
+        if (htmlElement.getAttribute('data-bs-theme') === 'dark') {
+            darkModeSwitch.checked = true;
+        }
+
+        darkModeSwitch.addEventListener('change', () => {
+            const nuevoTema = darkModeSwitch.checked ? 'dark' : 'light';
+            htmlElement.setAttribute('data-bs-theme', nuevoTema);
+            localStorage.setItem('theme', nuevoTema);
+        });
+    }
     function actualizarEstadoBoton(estaGuardado) {
         if (estaGuardado) {
             likeBtn.className = 'btn btn-danger text-white rounded-circle shadow-sm p-0 pulse-animation';

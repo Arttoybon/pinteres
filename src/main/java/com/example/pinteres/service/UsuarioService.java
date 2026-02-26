@@ -58,13 +58,13 @@ public class UsuarioService {
 	        }
 
 	        u.setCorreo("temp_" + u.getNombre() + "@mail.com");
-	        usuResp.saveAndFlush(u); 
+	        usuResp.saveAndFlush(u);
 
 	        // 3. Crear el nuevo usuario
 	        Usuario nuevoUsuario = new Usuario();
 	        nuevoUsuario.setNombre(usuNuevos.getNombre());
 	        nuevoUsuario.setCorreo(usuNuevos.getCorreo()); // Aquí ya no chocará
-	        
+
 	        if (nuevaPass != null && !nuevaPass.trim().isEmpty()) {
 	            nuevoUsuario.setContrasenya(encoder.encode(nuevaPass));
 	        } else {
@@ -82,7 +82,7 @@ public class UsuarioService {
 	        // 5. Guardar el nuevo y borrar el viejo definitivamente
 	        Usuario guardado = usuResp.save(nuevoUsuario);
 	        usuResp.delete(u);
-	        
+
 	        return guardado;
 	    } else {
 	        // Si el nombre es igual, solo actualizamos los campos normales
