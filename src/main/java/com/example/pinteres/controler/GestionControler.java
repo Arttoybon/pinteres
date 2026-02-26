@@ -46,6 +46,9 @@ public class GestionControler {
 		}
 
 		model.addAttribute("imgSeleccionada", seleccionada);
+		
+		model.addAttribute("paginaActiva", "pines");
+		
 		return "mis-pines";
 	}
 

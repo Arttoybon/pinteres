@@ -35,9 +35,10 @@ public class ImagenControler {
 	    
 	    model.addAttribute("imagenes", imagenService.listarTodas());
 	    model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-	    
-	    // AÑADE ESTA LÍNEA:
 	    model.addAttribute("imagenService", imagenService); 
+	    
+	    // Cambiamos "pagina" por "paginaActiva" para que coincida con el Navbar
+	    model.addAttribute("paginaActiva", "home");
 	    
 	    return "home";
 	}
@@ -63,18 +64,18 @@ public class ImagenControler {
 
 	@GetMapping("/mis-pines")
 	public String vistaGestion(Model model, HttpSession session) {
-		Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
-		if (user == null)
-			return "redirect:/";
+	    Usuario user = (Usuario) session.getAttribute("usuarioLogueado");
+	    if (user == null) return "redirect:/";
 
-		List<Imagen> misImagenes = imagenService.imagenesDeUsuario(user.getNombre());
-		model.addAttribute("imagenes", misImagenes);
+	    List<Imagen> misImagenes = imagenService.imagenesDeUsuario(user.getNombre());
+	    model.addAttribute("imagenes", misImagenes);
+	    model.addAttribute("paginaActiva", "pines"); // <--- Identificador para Mis Pines
 
-		if (!misImagenes.isEmpty()) {
-			model.addAttribute("primeraImagen", misImagenes.get(0));
-		}
+	    if (!misImagenes.isEmpty()) {
+	        model.addAttribute("primeraImagen", misImagenes.get(0));
+	    }
 
-		return "mis-pines";
+	    return "mis-pines";
 	}
 
 	// Añade estos métodos a ImagenControler.java
@@ -96,9 +97,8 @@ public class ImagenControler {
 
 	    model.addAttribute("imagenes", imagenService.listarGuardadas(user.getNombre()));
 	    model.addAttribute("tituloPagina", "Mis Favoritos");
-	    
-	    // ESTA LÍNEA ES LA QUE FALTA:
 	    model.addAttribute("imagenService", imagenService); 
+	    model.addAttribute("paginaActiva", "guardados"); // <--- Identificador para Favoritos
 
 	    return "home"; 
 	}
