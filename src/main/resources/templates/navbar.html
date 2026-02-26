@@ -13,7 +13,7 @@
             z-index: 1050; transition: all 0.3s;
         }
 
-        /* --- MODO OSCURO AUTOMÁTICO --- */
+        /* --- MODO OSCURO AUTOMÁTICO PARA NAVBAR --- */
         [data-bs-theme="dark"] .navbar-desktop, 
         [data-bs-theme="dark"] .navbar-top-mobile, 
         [data-bs-theme="dark"] .navbar-mobile-bottom,
@@ -23,17 +23,8 @@
             color: white !important;
         }
 
-        /* --- TRUCO ANTIPARPADEO DE ICONOS --- */
-        .theme-icon.bi-sun-fill { display: none !important; } /* Por defecto oculto */
-
-        [data-bs-theme="dark"] .theme-icon.bi-moon-fill { display: none !important; }
-        [data-bs-theme="dark"] .theme-icon.bi-sun-fill { 
-            display: inline-block !important; 
-            color: #ffc107 !important; 
-        }
-
         [data-bs-theme="dark"] .navbar-desktop i, 
-        [data-bs-theme="dark"] .navbar-mobile-bottom i:not(.bi-sun-fill) {
+        [data-bs-theme="dark"] .navbar-mobile-bottom i {
             color: #f8f9fa !important;
         }
 
@@ -61,10 +52,7 @@
         <a th:href="@{/gestion/mis-pines}" class="nav-link p-3"><i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i></a>
         <a th:href="@{/mis-guardados}" class="nav-link p-3"><i th:class="${paginaActiva == 'guardados' ? 'bi bi-heart-fill fs-2 text-danger' : 'bi bi-heart fs-2 text-danger'}"></i></a>
         <button class="btn p-3" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-square fs-2"></i></button>
-        <button class="btn p-3 mt-2 theme-toggle-btn">
-            <i class="bi bi-moon-fill fs-2 theme-icon"></i>
-            <i class="bi bi-sun-fill fs-2 theme-icon"></i>
-        </button>
+        
         <a th:href="@{/logout}" class="mt-auto p-3 text-muted"><i class="bi bi-box-arrow-right fs-2"></i></a>
     </div>
 
@@ -85,11 +73,9 @@
         <div class="d-flex justify-content-around align-items-center w-100 px-1">
             <a th:href="@{/home}" class="text-dark"><i th:class="${paginaActiva == 'home' ? 'bi bi-house-door-fill fs-2' : 'bi bi-house-door fs-2'}"></i></a>
             <a th:href="@{/gestion/mis-pines}" class="text-dark"><i th:class="${paginaActiva == 'pines' ? 'bi bi-grid-fill fs-2' : 'bi bi-grid fs-2'}"></i></a>
+            
             <button class="btn p-0" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-circle-fill fs-1 text-danger"></i></button>
-            <button class="btn p-0 theme-toggle-btn">
-                <i class="bi bi-moon-fill fs-2 theme-icon"></i>
-                <i class="bi bi-sun-fill fs-2 theme-icon"></i>
-            </button>
+            
             <a th:href="@{/usuario/mi-perfil}" class="text-dark"><i th:class="${paginaActiva == 'perfil' ? 'bi bi-person-circle-fill fs-2' : 'bi bi-person-circle fs-2'}"></i></a>
         </div>
     </div>
@@ -120,26 +106,6 @@
         </div>
     </div>
 
-    <script>
-        (function() {
-            const htmlElement = document.documentElement;
-            const aplicarTema = (tema) => {
-                htmlElement.setAttribute('data-bs-theme', tema);
-            };
-
-            const temaGuardado = localStorage.getItem('theme') || 'light';
-            aplicarTema(temaGuardado);
-
-            document.addEventListener('click', (e) => {
-                const btn = e.target.closest('.theme-toggle-btn');
-                if (btn) {
-                    const nuevoTema = htmlElement.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
-                    aplicarTema(nuevoTema);
-                    localStorage.setItem('theme', nuevoTema);
-                }
-            });
-        })();
-    </script>
 </div>
 </body>
 </html>

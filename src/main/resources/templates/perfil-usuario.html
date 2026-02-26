@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<head>
-<script>
+    <script>
         (function() {
             const tema = localStorage.getItem('theme') || 'light';
             if (tema === 'dark') {
@@ -41,6 +40,15 @@
         [data-bs-theme="dark"] .pin-card { background-color: #1e1e1e; }
         [data-bs-theme="dark"] .text-muted { color: #b0b0b0 !important; }
 
+        /* Estilo específico para el contenedor del switch */
+        .theme-switch-container {
+            background-color: rgba(0,0,0,0.03);
+            transition: all 0.3s;
+        }
+        [data-bs-theme="dark"] .theme-switch-container {
+            background-color: rgba(255,255,255,0.05);
+        }
+
         /* --- ESTILOS PARA LA NAVEGACIÓN --- */
         body { transition: background-color 0.3s, color 0.3s; }
         @media (min-width: 768px) {
@@ -50,7 +58,6 @@
    			 body { padding-bottom: 90px !important; }
 		}
 
-        /* --- ESTILOS DE LA PÁGINA --- */
         .pin-card { border-radius: 16px; overflow: hidden; border: none; transition: transform 0.2s; cursor: zoom-in; }
         .pin-card:hover { transform: scale(1.02); }
         .pin-img { border-radius: 16px; width: 100%; height: auto; object-fit: cover; }
@@ -74,6 +81,25 @@
 
         <div th:if="${esMiPerfil}" class="mx-auto" style="max-width: 500px;">
             <div class="card border-0 bg-light rounded-4 p-4 mb-5 shadow-sm">
+                
+                <div class="mb-4 text-start">
+                    <label class="form-label small fw-bold text-uppercase opacity-50">Apariencia</label>
+                    <div class="d-flex align-items-center justify-content-between p-3 rounded-4 theme-switch-container border">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-moon-stars-fill fs-5 me-3 text-primary"></i>
+                            <div>
+                                <p class="m-0 fw-bold small">Modo Oscuro</p>
+                                <p class="m-0 text-muted small" style="font-size: 0.75rem;">Cambia el aspecto de la aplicación</p>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input fs-4" type="checkbox" role="switch" id="darkModeSwitch" style="cursor: pointer;">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4 opacity-25">
+
                 <form th:action="@{/usuario/actualizar-perfil}" th:object="${usuario}" method="post">
                     <div class="mb-3 text-start">
                         <label class="form-label small fw-bold">Nombre de Usuario</label>
@@ -91,6 +117,7 @@
                         <button type="submit" class="btn btn-danger rounded-pill fw-bold">Actualizar Información</button>
                     </div>
                 </form>
+                
                 <hr class="my-4">
 			    <div class="text-center">
 			        <form th:action="@{/usuario/eliminar-cuenta}" method="post" 
@@ -117,12 +144,26 @@
                 </div>
             </div>
         </div>
-
-        <div th:if="${#lists.isEmpty(publicaciones)}" class="py-5 text-muted">
-            <i class="bi bi-camera fs-1"></i>
-            <p class="mt-2">Este usuario aún no tiene publicaciones.</p>
-        </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const htmlElement = document.documentElement;
+            const darkModeSwitch = document.getElementById('darkModeSwitch');
+
+            // Sincronizar el switch con el estado actual al cargar
+            if (htmlElement.getAttribute('data-bs-theme') === 'dark') {
+                darkModeSwitch.checked = true;
+            }
+
+            // Cambiar tema al pulsar el switch
+            darkModeSwitch.addEventListener('change', () => {
+                const nuevoTema = darkModeSwitch.checked ? 'dark' : 'light';
+                htmlElement.setAttribute('data-bs-theme', nuevoTema);
+                localStorage.setItem('theme', nuevoTema);
+            });
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
