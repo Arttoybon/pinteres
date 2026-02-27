@@ -1,3 +1,2 @@
-- probar a mover validarRecuperacion de usarioControler a LoginControler
--recrear la base de datos
+-probar a mover validarRecuperacion de usarioControler a LoginControler
 -pruebas unitaria
