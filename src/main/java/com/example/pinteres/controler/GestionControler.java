@@ -24,6 +24,16 @@ public class GestionControler {
 	@Autowired
 	private ImagenService imagenService;
 
+	/**
+	 * 
+	 * Pinta la vista de los pines del usuario.
+	 * 
+	 * @param id      Si se proporciona un id de la imagen, se preselecciona.
+	 * @param model   Datos para pintar la plantilla de mis-pines.
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return La plantilla a pintar. Si hay algún error, se mostrará alerta en la
+	 *         página.
+	 */
 	@GetMapping("/mis-pines")
 	public String vistaGestion(@RequestParam(required = false) Long id, Model model, HttpSession session) {
 		try {
@@ -57,6 +67,16 @@ public class GestionControler {
 		}
 	}
 
+	/**
+	 * Edita todos los atributos del pin
+	 * 
+	 * @param id      Identificador de la imagen
+	 * @param titulo  Titulo de la imagen
+	 * @param enlace  Enlace de la imagen
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return La plantilla a pintar. Si hay algún error, se mostrará alerta en la
+	 *         página.
+	 */
 	@PostMapping("/editar")
 	public String editar(@RequestParam Long id, @RequestParam String titulo, @RequestParam String enlace,
 			HttpSession session) {
@@ -70,7 +90,6 @@ public class GestionControler {
 				img.setTitulo(titulo);
 				img.setEnlace(enlace);
 
-				// ¡IMPORTANTE! Guardar los cambios
 				imagenService.actualizar(id, img);
 			}
 
@@ -81,6 +100,14 @@ public class GestionControler {
 		}
 	}
 
+	/**
+	 * Borra las imagenes por su identificador
+	 * 
+	 * @param id      Identificador de la imagen
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return La plantilla a pintar. Si hay algún error, se mostrará alerta en la
+	 *         página.
+	 */
 	@GetMapping("/borrar/{id}")
 	public String borrar(@PathVariable Long id, HttpSession session) {
 		try {

@@ -30,6 +30,14 @@ public class UsuarioControler {
 	@Autowired
 	private UsuarioService usuarioService;
 
+	/**
+	 * Recibe los datos del usuario y los guarda en la base de datos
+	 * 
+	 * @param nombre nombre del usuario
+	 * @param contrasenya contraseña del usuario
+	 * @param correo correo del usuario
+	 * @return Muestra una alerta de si se a completado con éxito o no
+	 */
 	@PostMapping("/registrar")
 	public String registrarUsuario(@RequestParam String nombre, @RequestParam String contrasenya,
 			@RequestParam String correo) { // Recibe el correo
@@ -48,6 +56,14 @@ public class UsuarioControler {
 		return "redirect:/?registrado=true";
 	}
 
+	/**
+	 * Valida si existe el usuario
+	 * 
+	 * @param nombre nombre del usuario
+	 * @param redirectAttrs atributos de la redirección de la página, query.
+	 * @param model contiene el erro en caso de usuario inexistente
+	 * @return muestra la pantalla del index o la de cambiar contraseña
+	 */
 	@PostMapping("/validar-recuperacion")
 	public String validarRecuperacion(@RequestParam("usuario") String nombre, RedirectAttributes redirectAttrs,
 			Model model) {
@@ -67,6 +83,14 @@ public class UsuarioControler {
 		}
 	}
 
+	/**
+	 * Muestra la plantilla de cambio de contraseña
+	 * 
+	 * @param tokenRecibido contraseña y usuario encriptado
+	 * @param nombreHasheadoRecibido nombre del usuario encriptado
+	 * @param model
+	 * @return id del usuario encontrado
+	 */
 	@GetMapping("/cambiar-password")
 	public String mostrarPantallaCambio(@RequestParam("token") String tokenRecibido,
 			@RequestParam("u") String nombreHasheadoRecibido, Model model) {
@@ -99,6 +123,13 @@ public class UsuarioControler {
 		return "redirect:/?enlaceInvalido=true";
 	}
 
+	/**
+	 * Sutituye la contraseña antigua por la nueva
+	 * 
+	 * @param nombreUsuario nombre del usuario
+	 * @param nuevaContrasenya nueva contraseña del usuario
+	 * @return Muestra el login
+	 */
 	@PostMapping("/actualizar-contraseya")
 	public String actualizarContraseya(@RequestParam("idViejo") String nombreUsuario,
 			@RequestParam("nuevaContrasenya") String nuevaContrasenya) {
@@ -108,6 +139,17 @@ public class UsuarioControler {
 		return "redirect:/?actualizado=true";
 	}
 
+	
+	
+	/**
+	 * Recibe los datos del usuario actualizado
+	 * 
+	 * @param nuevoNombre nuevo nombre del usuario
+	 * @param correo nuevo correo del usuario
+	 * @param nuevaPass nueva contraseña del usuario
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return Muestra el login en caso de error, si no un alert de que se han realizado.
+	 */
 	@PostMapping("/actualizar-perfil")
 	public String procesarActualizacion(@RequestParam String nuevoNombre,
 	                                   @RequestParam String correo,
@@ -133,6 +175,12 @@ public class UsuarioControler {
 	    return "redirect:/usuario/mi-perfil?exito=true";
 	}
 
+	/**
+	 * Elimina la cuenta de la base de datos e invalida la sesión
+	 * 
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return Muestra el login
+	 */
 	@PostMapping("/eliminar-cuenta")
 	public String eliminarCuenta(HttpSession session) {
 	    Usuario logueado = (Usuario) session.getAttribute("usuarioLogueado");
@@ -146,6 +194,13 @@ public class UsuarioControler {
 	    return "redirect:/?cuentaEliminada=true";
 	}
 
+	/**
+	 * Muestra el perfil del usuario logeado
+	 * 
+	 * @param model Contiene los datos del usuario y sus piblicaciones
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return Muestra el perfil del usuario
+	 */
 	@GetMapping("/mi-perfil")
     public String miPerfil(Model model, HttpSession session) {
         // 1. Obtener el usuario de la sesión
@@ -155,21 +210,29 @@ public class UsuarioControler {
             return "redirect:/";
         }
 
-        // 2. Usar el nombre exacto del método de tu ImagenService
-        // Tu servicio recibe el nombre (String), no el objeto Usuario completo
+
         List<Imagen> misPublicaciones = imagenService.imagenesDeUsuario(usuarioLogueado.getNombre());
 
-        // 3. Añadir todo al modelo usando la variable 'model'
+
         model.addAttribute("usuario", usuarioLogueado);
         model.addAttribute("publicaciones", misPublicaciones);
         model.addAttribute("esMiPerfil", true);
 
-        // ESTO ARREGLA EL ERROR "null context object" en perfil-usuario.html
+       
         model.addAttribute("imagenService", imagenService);
 
         return "perfil-usuario";
     }
 
+	
+    /**
+     * Muestra el perfil del usuario al que pertenece la id
+     * 
+     * @param nombre del usuario
+     * @param model Contiene los datos del usuario y sus piblicaciones, indicando que no es su perfil
+     * @param session Datos de sesión del usuario logeado.
+     * @return En caso de error te dirige al home
+     */
     @GetMapping("/perfil/{nombre}")
     public String perfilPublico(@PathVariable String nombre, Model model, HttpSession session) {
         // 1. Buscar al usuario cuyo perfil queremos ver

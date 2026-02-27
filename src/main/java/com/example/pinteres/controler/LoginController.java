@@ -30,11 +30,25 @@ public class LoginController {
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 
+	/**
+	 * Plantilla de registro
+	 * 
+	 * @return A si mismo
+	 */
 	@GetMapping("/")
 	public String index() {
 		return "index";
 	}
 
+	/**
+	 * Accion de iniciar sesion. Si se completa te lleva al home si no da error.
+	 * 
+	 * @param nombre nombre del usuario
+	 * @param contrasenya contraseña del usuario
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return La plantilla a pintar. Si hay algún error, se mostrará alerta en la
+	 *         página.
+	 */
 	@PostMapping("/login")
 	public String login(@RequestParam String nombre, @RequestParam String contrasenya, HttpSession session) {
 		String nombreMin = (nombre != null) ? nombre.toLowerCase().trim() : "";
@@ -47,12 +61,24 @@ public class LoginController {
 		return "redirect:/?error=true";
 	}
 
+	/**
+	 * Cierra la sesión en cualquier momento
+	 * 
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return Plantilla de login
+	 */
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();
 		return "redirect:/";
 	}
 
+	/**
+	 * Función de recuperar contraseña y enviar un correo de recuperación de esta al usuario
+	 * 
+	 * @param nombre del usuario
+	 * @return Si hay algún error, se mostrará alerta en la página y si se completa con éxito.
+	 */
 	@PostMapping("/recuperar-password")
 	public String sendEmail(@RequestParam("usuario") String nombre) {
 		try {

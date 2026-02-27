@@ -27,6 +27,15 @@ public class ImagenControler {
 		this.imagenService = imagenService;
 	}
 
+	/**
+	 * Muestra la página home y su contenido
+	 * 
+	 * @param model   Contiene las imagenes, si el usuario está logeado o no y un el
+	 *                servicios de las imagenes para saber si la imagen está
+	 *                guardada en favoritos
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return La plantilla a pintar.
+	 */
 	@GetMapping("/home")
 	public String home(Model model, HttpSession session) {
 		if (session.getAttribute("usuarioLogueado") == null) {
@@ -43,6 +52,15 @@ public class ImagenControler {
 		return "home";
 	}
 
+	/**
+	 * Añade una nueva imagen desde cualquier plantilla.
+	 * 
+	 * @param titulo  Titulo de la imagen
+	 * @param enlace  Enlace de la imagen
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return tras publicar redirigimos al home. Si hay algún error, se mostrará
+	 *         alerta en la página.
+	 */
 	@PostMapping("/publicar")
 	public String publicar(@RequestParam String titulo, @RequestParam String enlace, HttpSession session) {
 		try {
@@ -60,6 +78,12 @@ public class ImagenControler {
 		}
 	}
 
+	/**
+	 * @param model   Contiene las imagenes que ha publicado el usuario, si el
+	 *                usuario está logeado o no.
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return Muestra una plantilla
+	 */
 	@GetMapping("/mis-pines")
 	public String vistaGestion(Model model, HttpSession session) {
 		try {
@@ -70,11 +94,7 @@ public class ImagenControler {
 
 			List<Imagen> misImagenes = imagenService.imagenesDeUsuario(user.getNombre());
 			model.addAttribute("imagenes", misImagenes);
-			model.addAttribute("paginaActiva", "pines"); // <--- Identificador para Mis Pines
-
-			if (!misImagenes.isEmpty()) {
-				model.addAttribute("primeraImagen", misImagenes.get(0));
-			}
+			model.addAttribute("paginaActiva", "pines");
 
 			return "mis-pines";
 		} catch (Exception e) {
@@ -82,8 +102,14 @@ public class ImagenControler {
 		}
 	}
 
-	// Añade estos métodos a ImagenControler.java
-
+	/**
+	 * Se usa de forma dinamica al darle like a la imagen
+	 * 
+	 * @param id      Identificador de la imagen
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return si tras el click está guardado o no
+	 * 
+	 */
 	@PostMapping("/like/{id}")
 	@ResponseBody
 	public boolean toggleLike(@PathVariable Long id, HttpSession session) {
@@ -97,6 +123,15 @@ public class ImagenControler {
 		return imagenService.toggleLike(id, user.getNombre());
 	}
 
+	/**
+	 * Muestra los favoritos, pintando la plantilla de la home
+	 * 
+	 * @param model Contiene las imagenes, si el usuario está logeado o no y un el
+	 *                servicios de las imagenes para saber si la imagen está
+	 *                guardada en favoritos
+	 * @param session Datos de sesión del usuario logeado.
+	 * @return Plantilla home
+	 */
 	@GetMapping("/mis-guardados")
 	public String vistaGuardados(Model model, HttpSession session) {
 		Usuario user = (Usuario) session.getAttribute("usuarioLogueado");

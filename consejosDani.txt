@@ -1,2 +1,7 @@
 -probar a mover validarRecuperacion de usarioControler a LoginControler
 -pruebas unitaria
+- model.addAttribute("paginaActiva", "pines"); ->no hace falta que ponga paginaActiva solo mis pines
+---
+-Documentación de los métodos 
+- Usar DELETE en /borrar y demás (los form no pueden enviar DELETE ni PUT)
+- postman ejemplo - hay que usar el token de sesión que se devuelva!
