@@ -1,0 +1,6 @@
+com.example.pinteres
+com.example.pinteres.config
+com.example.pinteres.controler
+com.example.pinteres.entity
+com.example.pinteres.repository
+com.example.pinteres.service
